@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Glow Studio | SaaS Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">auto_awesome</span>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">GlowStudio</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-slate-500 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-slate-800 focus:ring-0 h-full placeholder:text-slate-500 px-4 rounded-r-lg text-sm font-normal" placeholder="Search analytics..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-4 lg:gap-8">
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Appointments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Staff</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Marketing</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden border border-slate-300 dark:border-slate-700">
+<img class="h-full w-full object-cover" data-alt="User profile avatar of a woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7l5Y3c-FBvEVBFSHM-oZpPoXEsgqnJqv0iDHCpMZ2pz3hknfOqPAqwc50NZbnkai5_0J5iaaBDDY0NanHdfJrOnzcRHu9rWnh-_vHfRu_KBeJ4w_gwZS1O5x9zy0v-qpnFDjpnlkudBi6YekRqHwm0MdwGvE7sTWhpW0da3c_ni4ouwraIwAFRQDZwyaqZNgQYzSGHxPMR8Udpg3C8cZCykDiurizBFqBUo6-9ft_P22pBy1p-HxIcj-o6UBPcINrHJxzYxu90OU"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 px-6 lg:px-10 py-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<h1 class="text-slate-900 dark:text-white text-3xl font-extrabold tracking-tight">Analytics Overview</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base mt-1">Monitor your salon's performance and growth metrics.</p>
+</div>
+<!-- Date Range Picker Mock -->
+<div class="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900 p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+<button class="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg shadow-sm">Today</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">Last 7 Days</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">Last 30 Days</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+                        Custom
+                    </button>
+</div>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Total Revenue</span>
+<div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+<span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-xl">payments</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">$12,450.00</h3>
+<span class="text-emerald-600 text-sm font-semibold">+12.5%</span>
+</div>
+<div class="mt-4 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-3/4"></div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Appt. Completion</span>
+<div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-xl">event_available</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">94.2%</h3>
+<span class="text-rose-500 text-sm font-semibold">-2.1%</span>
+</div>
+<div class="mt-4 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 w-[94%]"></div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">New vs Returning</span>
+<div class="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+<span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-xl">group</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">65% / 35%</h3>
+<span class="text-emerald-600 text-sm font-semibold">+5.0%</span>
+</div>
+<div class="mt-4 flex h-1 w-full rounded-full overflow-hidden">
+<div class="bg-primary w-[65%]"></div>
+<div class="bg-slate-200 dark:bg-slate-700 w-[35%]"></div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">AI Efficiency</span>
+<div class="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+<span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl">smart_toy</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white">88.5%</h3>
+<span class="text-emerald-600 text-sm font-semibold">+15.2%</span>
+</div>
+<div class="mt-4 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 w-[88%]"></div>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!-- Large Area Chart: Revenue Trends -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Revenue Trends</h3>
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="h-64 w-full relative">
+<!-- SVG Placeholder for Area Chart -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#3780f6" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#3780f6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0 180 Q100 150 200 160 T400 100 T600 120 T800 50 V200 H0 Z" fill="url(#chartGradient)"></path>
+<path d="M0 180 Q100 150 200 160 T400 100 T600 120 T800 50" fill="none" stroke="#3780f6" stroke-width="3"></path>
+<!-- Data Points -->
+<circle cx="200" cy="160" fill="#3780f6" r="4"></circle>
+<circle cx="400" cy="100" fill="#3780f6" r="4"></circle>
+<circle cx="600" cy="120" fill="#3780f6" r="4"></circle>
+<circle cx="800" cy="50" fill="#3780f6" r="4"></circle>
+</svg>
+<div class="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-slate-400 mt-2">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+</div>
+<!-- Doughnut Chart: Acquisition Channels -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Acquisition Channels</h3>
+<div class="flex flex-col items-center">
+<div class="relative h-48 w-48 mb-6">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-slate-100 dark:stroke-slate-800" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="45 100" stroke-width="3"></circle>
+<circle class="stroke-amber-400" cx="18" cy="18" fill="none" r="16" stroke-dasharray="25 100" stroke-dashoffset="-45" stroke-width="3"></circle>
+<circle class="stroke-emerald-400" cx="18" cy="18" fill="none" r="16" stroke-dasharray="30 100" stroke-dashoffset="-70" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-bold">1.2k</span>
+<span class="text-xs text-slate-400">Total Leads</span>
+</div>
+</div>
+<div class="w-full space-y-2">
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-primary"></div>
+<span class="text-slate-600 dark:text-slate-400">Instagram</span>
+</div>
+<span class="font-semibold">45%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+<span class="text-slate-600 dark:text-slate-400">Word of Mouth</span>
+</div>
+<span class="font-semibold">30%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-amber-400"></div>
+<span class="text-slate-600 dark:text-slate-400">Google Search</span>
+</div>
+<span class="font-semibold">25%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Bar Chart: Most Popular Services -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Popular Services</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="font-medium">Hair Coloring</span>
+<span class="text-slate-500">240 appointments</span>
+</div>
+<div class="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/80 w-[85%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="font-medium">Manicure &amp; Pedicure</span>
+<span class="text-slate-500">185 appointments</span>
+</div>
+<div class="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/60 w-[65%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="font-medium">Express Haircut</span>
+<span class="text-slate-500">142 appointments</span>
+</div>
+<div class="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 w-[50%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="font-medium">Facial Treatment</span>
+<span class="text-slate-500">98 appointments</span>
+</div>
+<div class="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/20 w-[35%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Table: Top Performing Staff -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Top Performing Staff</h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-slate-500 border-b border-slate-100 dark:border-slate-800">
+<th class="pb-3 font-medium text-sm">Stylist</th>
+<th class="pb-3 font-medium text-sm text-center">Appts.</th>
+<th class="pb-3 font-medium text-sm text-right">Revenue</th>
+<th class="pb-3 font-medium text-sm text-right">Rating</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+<tr>
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">ES</div>
+<div>
+<p class="text-sm font-semibold">Elena Smith</p>
+<p class="text-xs text-slate-500">Senior Stylist</p>
+</div>
+</div>
+</td>
+<td class="py-4 text-center text-sm font-medium">84</td>
+<td class="py-4 text-right text-sm font-bold text-slate-900 dark:text-white">$4,280</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1 text-amber-400">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold">4.9</span>
+</div>
+</td>
+</tr>
+<tr>
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">JM</div>
+<div>
+<p class="text-sm font-semibold">Jordan Miller</p>
+<p class="text-xs text-slate-500">Colorist</p>
+</div>
+</div>
+</td>
+<td class="py-4 text-center text-sm font-medium">76</td>
+<td class="py-4 text-right text-sm font-bold text-slate-900 dark:text-white">$3,850</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1 text-amber-400">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold">4.8</span>
+</div>
+</td>
+</tr>
+<tr>
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">SK</div>
+<div>
+<p class="text-sm font-semibold">Sarah Kim</p>
+<p class="text-xs text-slate-500">Nail Tech</p>
+</div>
+</div>
+</td>
+<td class="py-4 text-center text-sm font-medium">92</td>
+<td class="py-4 text-right text-sm font-bold text-slate-900 dark:text-white">$2,100</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1 text-amber-400">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold">5.0</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

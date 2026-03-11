@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Salon Management - Services &amp; Pricing</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">content_cut</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">SalonPro</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">Services</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Staff</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Appointments</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-slate-100 dark:bg-slate-800 border-none">
+<div class="text-slate-500 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-sm placeholder:text-slate-500" placeholder="Search..." value=""/>
+</div>
+</label>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Female salon manager portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8zH23R6CcGJgIDlAecR-qM_GowIMF3tgfaIFwfMAzs_DPgMigvXtz7Jx1x7RgHvKyX2LXmgPgxcmzCdA_kTL5BwYlDsRYHJMrzq-ecJG-b59UoN54Gh1BGZ9Y6ouEIYaY5r_56NJFDkxkOeP7S60L6DIiwEod_kXu7q7CIcz89YM2LCOdmDGIJQ907lhaL6IPNxOkvnvefap3rRrGgyvPstph0FndzXftUabx_0kyKTVve_oWvL-nE1rsGaTLtrMUiaRjGUdqzpA"/>
+</div>
+</div>
+</header>
+<main class="flex-1 px-4 lg:px-10 py-8 max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div class="space-y-1">
+<h1 class="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Services &amp; Pricing</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base">Manage your salon menu, pricing, and service durations.</p>
+</div>
+<button class="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                        Add New Service
+                    </button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 space-y-6">
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
+<div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold rounded-md bg-white dark:bg-slate-700 shadow-sm text-primary">All</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900">Hair</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900">Nails</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900">Skin</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900">Massage</button>
+</div>
+<div class="relative flex-1 min-w-[200px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" placeholder="Search services..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold">
+<th class="px-6 py-4">Service Name</th>
+<th class="px-6 py-4">Category</th>
+<th class="px-6 py-4">Duration</th>
+<th class="px-6 py-4">Price</th>
+<th class="px-6 py-4 text-center">Status</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-semibold text-slate-900 dark:text-slate-100">Signature Haircut</div>
+<div class="text-[11px] text-slate-400">Includes wash &amp; style</div>
+</td>
+<td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[11px] font-bold uppercase">Hair</span></td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">45m</td>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">$65.00</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer bg-slate-50/30 dark:bg-slate-800/10">
+<td class="px-6 py-4">
+<div class="font-semibold text-slate-900 dark:text-slate-100">Gel Manicure</div>
+<div class="text-[11px] text-slate-400">UV cured long lasting</div>
+</td>
+<td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 text-[11px] font-bold uppercase">Nails</span></td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">60m</td>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">$45.00</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-semibold text-slate-900 dark:text-slate-100">Deep Tissue Massage</div>
+<div class="text-[11px] text-slate-400">Full body therapeutic</div>
+</td>
+<td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-[11px] font-bold uppercase">Massage</span></td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">1.5h</td>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">$120.00</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer opacity-60">
+<td class="px-6 py-4">
+<div class="font-semibold text-slate-900 dark:text-slate-100">HydraFacial</div>
+<div class="text-[11px] text-slate-400">Advanced skin resurfacing</div>
+</td>
+<td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold uppercase">Skin</span></td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">45m</td>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">$150.00</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">Inactive</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 space-y-6">
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sticky top-24">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Service Details</h3>
+<span class="material-symbols-outlined text-slate-400">info</span>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Description</h4>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                                        Professional styling and haircut tailored to individual face shape and preference. Includes luxury shampoo, conditioning, and professional blow-dry finish.
+                                    </p>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Assigned Staff (4)</h4>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+<div class="w-6 h-6 rounded-full bg-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Staff member Sarah" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlocMNq9esqe8x-KZA8BVq72drhFEUeBE5M314Db7f51BoTgaoIfG6q9x2CfQL7WTlAThLwEQ0bpfItGxR5DGLER11OJXQZMn6QHA1GC3RBkCc2QGtC9-vzMkBMJZASCI_UJAux5WIwiPCI11FJ0ZdvBl0iUlnoMl848nPvBc2X1bVfsphI2r8EGlQ2qfKDT3fDOEfEz_oh5HwTZREPQtRC4kPue42ra6__F9wVz_UsDoT4ZIAcD_kbosN7bMb1UCU7rvqHJwc6QY"/>
+</div>
+<span class="text-xs font-medium">Sarah M.</span>
+</div>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+<div class="w-6 h-6 rounded-full bg-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Staff member James" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL9mjadMHTN2pLGuSYfY_q1FIU_obOzZXmm4L4tukfKp1-4Cq7jBGtLEi7RyNkF36YsV6YDUDYZS28jZJAwWpKQslbyqW8AxEe2HtjPJtp9dSAqlAWsjZonf6n7lmDOX2RPUgfucf21bJK2-g75s6FV8EnSco9LFwkZGlJ9T1sh_YhLuZnTVxy65m_vZqcIzS5-LRpVt0vJqnIvP7yJbMdrhMDG0Y4gPusPip8MA4KmOWZtMOAzUwuVSM0BaMcaeBkg6JnvrHtF5A"/>
+</div>
+<span class="text-xs font-medium">James L.</span>
+</div>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+<div class="w-6 h-6 rounded-full bg-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Staff member Elena" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfAMcuDFe9SYLNcYVpkT9SbW322pGqCTktW_yM1zz9wA6s14ki_69BCnJk3Hy1Y9jfp_PyMK3Xj-WoOqvow-8ik8oCCNLb87qr4Ru-qyw49_zjSnOo43nHhRpR85ChLtXu0u7qOryGfw3Yd0ijHmKkzxzee9vdrpTZXVQ8GTctVD1nRWC1WXmsdq-8blF3i2WYawqrkGl6YVHlWndUWHHRDatEKJjRom1Ub4WTGeT_i_75RygB1ULDIzdiipv7LAobtbFiT08JkMs"/>
+</div>
+<span class="text-xs font-medium">Elena R.</span>
+</div>
+<button class="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4">Scheduling Settings</h4>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Before Buffer</label>
+<div class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined text-primary text-[18px]">hourglass_top</span>
+                                                10 mins
+                                            </div>
+</div>
+<div class="space-y-1">
+<label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">After Buffer</label>
+<div class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined text-primary text-[18px]">hourglass_bottom</span>
+                                                15 mins
+                                            </div>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-lg transition-all text-sm">
+                                    View Full Analytics
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>AI Settings - SalonSaaS</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">content_cut</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">SalonSaaS</h2>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-sm font-medium">Appointments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-sm font-medium">Staff</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined fill-1">smart_toy</span>
+<span class="text-sm font-bold">AI Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-sm font-medium">Billing</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVv40zneIJWvoon2XnTHOPXeJXO-CBMRlguq78DDNVxFAAaAS4vYHsNTAhP37c7C31YmCtoYbOi1wqxZBto16R30eAgPVbRFXIW0cFFz_ruNtisWB34umbZ2Ah1EPtKs1T1xudPTp2Ss4Ef0PJQ0RGQ2opoLsxc_WSJ1WWVq-5CMANkVxw71fK970Nnppk-uDWxW3QZogB9NWhPSC6bZLxAN4lT2AmQpUjEnJ6sYVGWiLsgvgWZwNnTyLO7BK3fsCT-SsFin7a03w"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold truncate">Jane Cooper</p>
+<p class="text-[10px] text-slate-500 truncate">Admin Profile</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-64">
+<!-- Top Navbar -->
+<header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<h1 class="text-lg font-semibold">AI Settings</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="size-10 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+                    Save Changes
+                </button>
+</div>
+</header>
+<div class="p-8 max-w-5xl mx-auto">
+<div class="mb-8">
+<h2 class="text-3xl font-black tracking-tight mb-2">Configure AI Receptionist</h2>
+<p class="text-slate-500 dark:text-slate-400">Set up your virtual assistant to handle client bookings, answer FAQs, and manage your salon calendar.</p>
+</div>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto whitespace-nowrap">
+<button class="px-6 py-3 text-sm font-bold border-b-2 border-primary text-primary">General Config</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">Services &amp; Pricing</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">Working Hours</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">Staff Settings</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Main Form Section -->
+<div class="lg:col-span-2 space-y-8">
+<!-- AI Personality Card -->
+<section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+<h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">face_retouching_natural</span>
+                            AI Personality
+                        </h3>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-semibold mb-1.5">Business Bio &amp; AI Training Data</label>
+<textarea class="w-full min-h-32 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Describe your salon, the experience you offer, and any specific instructions for the AI receptionist..."></textarea>
+<p class="text-xs text-slate-500 mt-2">The AI uses this information to answer customer questions about your salon style and values.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-semibold mb-1.5">AI Tone</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary">
+<option>Friendly &amp; Casual</option>
+<option>Professional &amp; Polished</option>
+<option>Luxury &amp; Exclusive</option>
+<option>Minimalist &amp; Efficient</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold mb-1.5">Language</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary">
+<option>English (US)</option>
+<option>Spanish</option>
+<option>French</option>
+<option>German</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Appointment Config Card -->
+<section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+<h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">timer</span>
+                            Appointment Duration Settings
+                        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-semibold mb-1.5">Default Buffer Time (Minutes)</label>
+<div class="flex items-center gap-2">
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary" type="number" value="15"/>
+<span class="text-sm text-slate-500">mins</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold mb-1.5">Max Advanced Booking</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary">
+<option>30 Days</option>
+<option>60 Days</option>
+<option>90 Days</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Service List Card -->
+<section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">content_cut</span>
+                                Services &amp; Pricing
+                            </h3>
+<button class="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Add Service
+                            </button>
+</div>
+<div class="space-y-3">
+<!-- Service Item -->
+<div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="flex gap-3 items-center">
+<div class="size-10 bg-primary/10 rounded flex items-center justify-center text-primary font-bold">SC</div>
+<div>
+<p class="text-sm font-bold">Signature Haircut</p>
+<p class="text-xs text-slate-500">45 mins • $65.00</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</div>
+<!-- Service Item -->
+<div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="flex gap-3 items-center">
+<div class="size-10 bg-primary/10 rounded flex items-center justify-center text-primary font-bold">BC</div>
+<div>
+<p class="text-sm font-bold">Balayage Coloring</p>
+<p class="text-xs text-slate-500">120 mins • $180.00</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Form Section -->
+<div class="space-y-8">
+<!-- Working Hours Card -->
+<section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+<h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                            Working Hours
+                        </h3>
+<div class="space-y-4">
+<!-- Day Selector -->
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium w-20">Mon - Fri</span>
+<div class="flex items-center gap-2">
+<input class="w-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded p-1 text-[10px] text-center" type="text" value="09:00 AM"/>
+<span class="text-xs">-</span>
+<input class="w-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded p-1 text-[10px] text-center" type="text" value="06:00 PM"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium w-20">Saturday</span>
+<div class="flex items-center gap-2">
+<input class="w-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded p-1 text-[10px] text-center" type="text" value="10:00 AM"/>
+<span class="text-xs">-</span>
+<input class="w-20 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded p-1 text-[10px] text-center" type="text" value="04:00 PM"/>
+</div>
+</div>
+<div class="flex items-center justify-between opacity-50">
+<span class="text-sm font-medium w-20">Sunday</span>
+<span class="text-xs font-bold text-red-500">Closed</span>
+</div>
+<hr class="border-slate-100 dark:border-slate-800"/>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium">Auto-accept appointments</span>
+<div class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary cursor-pointer">
+<div class="inline-block h-3.5 w-3.5 transform rounded-full bg-white translate-x-5 transition-transform"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Staff Members Card -->
+<section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+<h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person</span>
+                            Assigned Staff
+                        </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img class="size-8 rounded-full object-cover" data-alt="Staff member profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2vrZPQbmD8kM2J229ZboZ09iDvu52XZXRK8oe8T1Ofhqc7CeABumrFyRyO8IR8NJxuzLLxHBZY51ZrTg91qbvU2aDVf4DBAglOC_oRpZ5KGmX-gqvWmMTjgUhkrJNrlm8ZmKukBfhxA0kRz73udNw3xLk_0lvLLrmfbKMmISnAQn1zkSkOMvBSgubkXkqHAsrEvhvvhTDwchtMOH71cPMsBezsUQdpgyoGl4oP0HyvHj8CPxRp4F2FpSq4tf4FCYGOAmLUG-3vTo"/>
+<div>
+<p class="text-xs font-bold">Alex Rivers</p>
+<p class="text-[10px] text-slate-500">Master Stylist</p>
+</div>
+</div>
+<div class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary cursor-pointer">
+<div class="inline-block h-3.5 w-3.5 transform rounded-full bg-white translate-x-5 transition-transform"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img class="size-8 rounded-full object-cover" data-alt="Staff member profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW9FlMrP8yfNWLrovDcouV9RUc7jzg5Di3LiSN2QV9VkIa_Xw-Lxwh8xlIwS4RKijpDkSIXfT9pLhgCoAfCvLKNCfVrgYU6n9MEKfqXHUXi6ZwmkmyCHrk-2NjNnfTMztJrwJtBrqvM6q2r7MPK_2j3qJUh-mtWMns4TFySh0m7tINnSLmB8oVmFdkF_nBi6xzCOcOOhLJIkYuwqgdQ2byPxjcExP6ISbQ-kfjLSw16Q08EMZ9uGTKioilqTWFwzJysQ9XW9k5EPs"/>
+<div>
+<p class="text-xs font-bold">Maria Chen</p>
+<p class="text-[10px] text-slate-500">Color Expert</p>
+</div>
+</div>
+<div class="relative inline-flex h-5 w-9 items-center rounded-full bg-slate-200 dark:bg-slate-700 cursor-pointer">
+<div class="inline-block h-3.5 w-3.5 transform rounded-full bg-white translate-x-0.5 transition-transform"></div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            Manage All Staff
+                        </button>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3780f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
+            },
+            fontFamily: {
+              "display": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<title>BeautySaaS - Customer CRM</title>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-6">
+<h1 class="text-primary text-xl font-bold tracking-tight">BeautySaaS</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Salon Management System</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-primary/10 text-primary rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">calendar_month</span>
+                Appointments
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">content_cut</span>
+                Services
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">payments</span>
+                Billing
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+                Settings
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+<div class="flex items-center gap-2">
+<h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Customers</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3Yn7_f2ET5eFG1t0EiY6dllr5zph0fyZ8sDO2AeXChsL0cpgQUfCp31NsDvbXpViq2MpxycVl8Fd3t2jD_0QNctyeD9xhtcxntgyXL_zywyY36xeseQwCORuW2bAmJ6jxWQb9gT61lQzn6eCNKr2O8IwITWX1SA1GxKvMdI7HYlhQk8V0txcO-nqj5usKyLY6EAiaUSGxrJNW5WgAgVVyGm1mDcwrmFgOKK08lrgXZPwhLSVPgd_Afvu4V2T1XPC_7efSCepspNk"/>
+</div>
+</div>
+</header>
+<!-- Viewport -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-6xl mx-auto space-y-6">
+<!-- Toolbar -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div class="flex-1 w-full sm:max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" placeholder="Search customers..." type="text"/>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto">
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filters
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 shadow-sm transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+                            Add Customer
+                        </button>
+</div>
+</div>
+<!-- Tabs/Filters -->
+<div class="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 pb-px">
+<button class="px-4 py-2 text-sm font-medium text-primary border-b-2 border-primary -mb-px">All Customers</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-b-2 border-transparent hover:border-slate-300 transition-all">VIP Only</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-b-2 border-transparent hover:border-slate-300 transition-all">New (Last 30d)</button>
+<button class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-b-2 border-transparent hover:border-slate-300 transition-all">Inactive</button>
+</div>
+<!-- Table Card -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Age</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Visit Count</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Service</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tags</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">JD</div>
+<span class="text-sm font-medium">Jane Doe</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">(555) 012-3456</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">28</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">12</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">Oct 12, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/20 text-primary uppercase">VIP</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase ml-1">Frequent</span>
+</td>
+<td class="px-6 py-4 text-right whitespace-nowrap">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-xs font-bold">AS</div>
+<span class="text-sm font-medium">Alice Smith</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">(555) 098-7654</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">34</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">1</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">Nov 05, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 uppercase">New</span>
+</td>
+<td class="px-6 py-4 text-right whitespace-nowrap">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 text-xs font-bold">MR</div>
+<span class="text-sm font-medium">Mark Robinson</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">(555) 443-2211</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">42</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">8</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">Sep 20, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase">Frequent</span>
+</td>
+<td class="px-6 py-4 text-right whitespace-nowrap">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 text-xs font-bold">SH</div>
+<span class="text-sm font-medium">Sarah Hughes</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">(555) 777-8899</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">22</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">15</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">Oct 28, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/20 text-primary uppercase">VIP</span>
+</td>
+<td class="px-6 py-4 text-right whitespace-nowrap">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-xs font-bold">TM</div>
+<span class="text-sm font-medium">Tom Miller</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">(555) 234-5678</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">55</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">3</td>
+<td class="px-6 py-4 text-sm whitespace-nowrap">Aug 15, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase">Regular</span>
+</td>
+<td class="px-6 py-4 text-right whitespace-nowrap">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<span class="text-xs text-slate-500 dark:text-slate-400">Showing 1 to 5 of 124 results</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1 text-xs font-medium border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 text-xs font-medium bg-primary text-white rounded shadow-sm">1</button>
+<button class="px-3 py-1 text-xs font-medium border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800">2</button>
+<button class="px-3 py-1 text-xs font-medium border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800">3</button>
+<button class="px-3 py-1 text-xs font-medium border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

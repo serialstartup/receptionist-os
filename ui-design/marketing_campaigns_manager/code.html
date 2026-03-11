@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Campaigns Dashboard - GlowSaaS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-size: 20px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-2 mb-8">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h1 class="text-slate-900 dark:text-white font-bold text-lg leading-none">GlowSaaS</h1>
+<p class="text-slate-500 text-xs mt-1">Beauty Management</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="text-sm font-medium">Campaigns</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Clients</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">Appointments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Navbar -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg pl-10 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search campaigns..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+<div class="text-right">
+<p class="text-sm font-semibold leading-none">Sarah Miller</p>
+<p class="text-xs text-slate-500 mt-1">Salon Owner</p>
+</div>
+<div class="size-9 rounded-full bg-slate-200 overflow-hidden border-2 border-primary/20" data-alt="Profile picture of a professional woman">
+<img alt="Sarah Miller" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRsIknKksJJ0FMSIsqiabxGYqUh2VW8zX4Gu36PQSVU3GjJ09UTrk5JcoZ4FgugIakhARXdSJJHvW3xfNxTCyMlDhxpDzVV9F1yuNvNT2ThuN4dVJA-QtVKWoYWeNGU0eQbLtBX3cgVLN3ScBY_ph5YR0KzVSY6-eGF3OBBPF2mTvw6fbu27-Y9hDZObsCos2bMB7Rl2UMKPZPqz7A9e8CGPzfvx2DabABar0SXFkqi3oXY6TfrUobPxsWPu2OcDGClLRCVjGVSTU"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Marketing Campaigns</h2>
+<p class="text-slate-500 mt-1">Grow your business with smart messaging.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 shadow-sm transition-all active:scale-95" onclick="document.getElementById('campaign-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined">add</span>
+                        Create New Campaign
+                    </button>
+</div>
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="size-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">outgoing_mail</span>
+</div>
+<span class="text-green-500 text-xs font-bold bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">+12%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Messages Sent</p>
+<h3 class="text-2xl font-bold mt-1">12,840</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="size-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">ads_click</span>
+</div>
+<span class="text-green-500 text-xs font-bold bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">+5.4%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Avg. Conversion Rate</p>
+<h3 class="text-2xl font-bold mt-1">18.2%</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="size-10 bg-orange-50 dark:bg-orange-900/20 text-orange-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-slate-500 text-xs font-bold bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-full">This Month</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Campaign Revenue</p>
+<h3 class="text-2xl font-bold mt-1">$4,120.00</h3>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex border-b border-slate-200 dark:border-slate-800 mb-6">
+<button class="px-6 py-3 text-primary border-b-2 border-primary font-semibold text-sm">All Campaigns</button>
+<button class="px-6 py-3 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm">Active</button>
+<button class="px-6 py-3 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm">Scheduled</button>
+<button class="px-6 py-3 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium text-sm">Completed</button>
+</div>
+<!-- Campaign List -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Campaign Name</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Recipients</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Conversion</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Campaign 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-green-100 dark:bg-green-900/30 text-green-600 rounded flex items-center justify-center">
+<span class="material-symbols-outlined">chat</span>
+</div>
+<div>
+<p class="text-sm font-semibold">WhatsApp Summer Promo</p>
+<p class="text-xs text-slate-500">20% off all services</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+<span class="size-1.5 rounded-full bg-green-600"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-5 text-sm font-medium">1,240</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 24%"></div>
+</div>
+<span class="text-sm font-semibold">24%</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Campaign 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded flex items-center justify-center">
+<span class="material-symbols-outlined">sms</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Reminder Message</p>
+<p class="text-xs text-slate-500">Daily appointment reminders</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+<span class="size-1.5 rounded-full bg-blue-600"></span>
+                                        Scheduled
+                                    </span>
+</td>
+<td class="px-6 py-5 text-sm font-medium">450</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3 text-slate-400 italic">
+<span class="text-xs">Pending start</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Campaign 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-slate-100 dark:bg-slate-800 text-slate-600 rounded flex items-center justify-center">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Spring Skincare Flash</p>
+<p class="text-xs text-slate-500">Expired May 30, 2024</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400">
+<span class="size-1.5 rounded-full bg-slate-500"></span>
+                                        Completed
+                                    </span>
+</td>
+<td class="px-6 py-5 text-sm font-medium">2,800</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 12%"></div>
+</div>
+<span class="text-sm font-semibold">12%</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+<!-- Create Campaign Modal -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" id="campaign-modal">
+<div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+<h3 class="text-xl font-bold">Create New Campaign</h3>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" onclick="document.getElementById('campaign-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-6 grid gap-4">
+<p class="text-slate-500 text-sm mb-2">Choose your campaign type to get started:</p>
+<!-- Option 1 -->
+<button class="group flex items-start gap-4 p-4 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-left">
+<div class="size-12 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined !text-3xl">chat_bubble</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">WhatsApp Promotion</h4>
+<p class="text-sm text-slate-500 mt-1">Send rich media messages with images and quick-reply buttons directly to clients' WhatsApp.</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">chevron_right</span>
+</button>
+<!-- Option 2 -->
+<button class="group flex items-start gap-4 p-4 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-left">
+<div class="size-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined !text-3xl">sms</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">SMS Reminder</h4>
+<p class="text-sm text-slate-500 mt-1">Classic text messages for appointment confirmations, reminders, and flash sales.</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">chevron_right</span>
+</button>
+<!-- Option 3 -->
+<button class="group flex items-start gap-4 p-4 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-left">
+<div class="size-12 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined !text-3xl">schedule_send</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Scheduling &amp; Automation</h4>
+<p class="text-sm text-slate-500 mt-1">Set up recurring birthday messages or automated follow-ups after service.</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">chevron_right</span>
+</button>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-6 flex justify-end gap-3">
+<button class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white" onclick="document.getElementById('campaign-modal').classList.add('hidden')">Cancel</button>
+<button class="px-6 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-all">Next Step</button>
+</div>
+</div>
+</div>
+</body></html>

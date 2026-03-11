@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Appointments | BeautyPro SaaS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">content_cut</span>
+<span class="text-xl font-bold tracking-tight">BeautyPro</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium uppercase tracking-wider">Salon Management</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined fill-1">calendar_month</span>
+<span class="text-sm font-medium">Appointments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">content_cut</span>
+<span class="text-sm font-medium">Services</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Navbar -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search appointments, customers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
+<span class="material-symbols-outlined text-2xl">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-sm font-semibold">Alex Rivera</p>
+<p class="text-xs text-slate-500">Salon Owner</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-primary/20">
+<img alt="User Profile" data-alt="Professional headshot of a salon manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA109CytJJkkyVaocY7RJTwXTLh2jT-KsE5eAiVExUJqwX9onpMhS72UCbxPeLAMv4EMfFLY6hWy6Ms4rx5rINg58SdEb0j_OXdFhhuRxn4eTj-COZbjAdJInVutlJmxhYRvjW12C5rxv4bc3vwiaaZu-GyOGgmLm-U8SjK5b9_eua-l-NF0_yxEPvUKQ0hmmlKODjoXbyAboOczYrp1lIk7RzxW3wz-tlY6nubOvctSOrZY3mewn1zphgmMzaEHxcvm7R_WoTRw4o"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Body -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Header Actions -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h1 class="text-3xl font-bold tracking-tight">Appointments</h1>
+<p class="text-slate-500 mt-1 font-medium">Manage your daily schedule and client bookings</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-lg">file_download</span>
+                            Export
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm">
+<span class="material-symbols-outlined text-lg">add</span>
+                            New Appointment
+                        </button>
+</div>
+</div>
+<!-- Tabs & Controls -->
+<div class="space-y-6">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-px">
+<div class="flex gap-8">
+<button class="relative py-4 text-sm font-semibold text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary">
+                                List View
+                            </button>
+<button class="py-4 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                                Calendar View
+                            </button>
+<button class="py-4 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                                Staff Schedule
+                            </button>
+</div>
+<div class="flex items-center gap-3 pb-3 sm:pb-0">
+<div class="flex rounded-lg border border-slate-200 dark:border-slate-800 p-1 bg-white dark:bg-slate-900">
+<button class="px-3 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 rounded-md shadow-sm">Today</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700">Week</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700">Month</button>
+</div>
+</div>
+</div>
+<!-- Appointments Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Time Slot</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Customer</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Service</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Staff</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">09:00 AM</span>
+<span class="text-xs text-slate-500">60 min</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">SJ</div>
+<span class="text-sm font-semibold">Sarah Johnson</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="text-sm text-slate-600 dark:text-slate-400">Haircut &amp; Styling</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700">
+<img alt="Elena" class="rounded-full" data-alt="Staff member profile picture small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3AfJ3qoP0b7BYfkKEgBmQS5V8p1IM3c913erntygqsITcKZcrzqyf711o1ZoDkBSpXonecVuIvcA-7yoHbdMLFiqo4AjRs5dOeYrW_sJuLQ7lfx27A7SqpCZGAwOldQ9LRzDjq0U87AR-mMQ_QDLd4dbcvZR6w1voe-CuenLTU0ofjxpiBg4My4f_0bxEms6ETddsLJpWExEg3l86Blrrx_Uk4cCjCYIMUHlS_2hzM5LOWeCTHRmS5ROlzjncaF2RoYpHSSqrbTI"/>
+</div>
+<span class="text-sm text-slate-600 dark:text-slate-400">Elena Ross</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                                Confirmed
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">10:30 AM</span>
+<span class="text-xs text-slate-500">45 min</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 flex items-center justify-center font-bold text-xs uppercase">MC</div>
+<span class="text-sm font-semibold">Michael Chen</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600 dark:text-slate-400">Facial Treatment</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700">
+<img alt="David" class="rounded-full" data-alt="Staff member profile picture small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA54fJQsGWRkhqQbVKU_mXkPx4SEQ_EGIp7hPe9p_MgxPGGw3bgA1qBRLYhYjw3_OzIRPIlR4Z-w9_McNAJj46QjsA0Z2afThRzpKnrDAspw8QrB7tYK0ICiQkHlieWAo4pEykksGihsdI2aDiQKxUEvSRHEu5grP9y61rt7d87JnabDOVM6ilq4cDp9Z6EdNBBpPny5PmjyCXKPg25ncYpDC0GbvxePeBcu_OLR9Va0F8ICp6Ea0Yf38M8lYVe0VDDf27ypD0R22A"/>
+</div>
+<span class="text-sm text-slate-600 dark:text-slate-400">David Smith</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                                                Pending
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group bg-slate-50/40 dark:bg-slate-800/20">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">11:45 AM</span>
+<span class="text-xs text-slate-500">30 min</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex items-center justify-center font-bold text-xs uppercase">ED</div>
+<span class="text-sm font-semibold">Emma Davis</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600 dark:text-slate-400">Manicure</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700">
+<img alt="Elena" class="rounded-full" data-alt="Staff member profile picture small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_VdFj-uRDDl0sTOG_rK8U-pLy3GYbdZoLRrnlJZcJhosDtd4vN0ea_FrFQ47hofxjdevS9nFxnYvgQzFluVJa_RQ8WAalEoCYr7BmXu3qxRmhOM8jxz0iFrYoRhsP2ktFAZTriqpRj6uwvOPnv2JEizKWS3U-cZko10eNsKGTuT981-iE_ngYOSdasAYq6pGfXt0-JVf-e14qnKhP08355OQEK4rAvYx8cc-B3nf_ECWibXHo40EfYoUBAgEJ33S1k2JLrJseQ9s"/>
+</div>
+<span class="text-sm text-slate-600 dark:text-slate-400">Elena Ross</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+                                                Completed
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">01:30 PM</span>
+<span class="text-xs text-slate-500">120 min</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center font-bold text-xs uppercase">SW</div>
+<span class="text-sm font-semibold">Sophia White</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-600 dark:text-slate-400">Balayage &amp; Coloring</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700">
+<img alt="Jessica" class="rounded-full" data-alt="Staff member profile picture small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlwPwkNiv-NJO2zC6zC7Xvtz-KmsyBIaoGp3h8BcSirWCkDv0oaHAmmyHBHvS_eE9wFugScKLUNhFKtNii06jvIPsJo5TQ4w7xmFH2Go7-CI5VNU5bnzxrCAFEbWHHRVvtldF-pZff3-1HmWkEa3sGOIjK-3awRqVgGwQPSt4Zs3qLu5go5M1VYss0tvcPsQl8R5d4T1lZwWX6dwEIvAM0Z7-MXKlyoF21Cr6Tm5qilFATYHyHOJ9-HVx7m09Bw3nvrK94G4Av0w"/>
+</div>
+<span class="text-sm text-slate-600 dark:text-slate-400">Jessica Lee</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                                Confirmed
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-sm text-slate-500">Showing <span class="font-bold text-slate-900 dark:text-slate-100">4</span> of <span class="font-bold text-slate-900 dark:text-slate-100">24</span> appointments</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-sm font-medium border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 transition-colors disabled:opacity-50">Previous</button>
+<button class="px-3 py-1 text-sm font-medium border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-50 transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Stats/Calendar Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<p class="text-sm font-medium text-slate-500">Bookings Today</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">event_available</span>
+</div>
+<p class="text-2xl font-bold">18</p>
+<p class="text-xs text-green-600 mt-1 font-semibold flex items-center">
+<span class="material-symbols-outlined text-xs mr-1">trending_up</span>
+                            +12% from yesterday
+                        </p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<p class="text-sm font-medium text-slate-500">Expected Revenue</p>
+<span class="material-symbols-outlined text-green-600 bg-green-100 dark:bg-green-900/30 p-2 rounded-lg">payments</span>
+</div>
+<p class="text-2xl font-bold">$1,420.00</p>
+<p class="text-xs text-slate-500 mt-1 font-medium">8 slots remaining</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<p class="text-sm font-medium text-slate-500">Waitlist</p>
+<span class="material-symbols-outlined text-amber-600 bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">group_add</span>
+</div>
+<p class="text-2xl font-bold">5</p>
+<p class="text-xs text-slate-500 mt-1 font-medium">Clients waiting for cancellations</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BeautySaaS - Messages</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3780f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-full">
+<div class="p-6 flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">spa</span>
+</div>
+<div>
+<h1 class="font-bold text-lg leading-tight">BeautySaaS</h1>
+<p class="text-xs text-slate-500">Admin Portal</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-sm font-medium">Calendar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-sm font-medium">Messages</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 bg-center bg-cover" data-alt="User profile avatar photo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9H9S-6H7FhU0oNlIvyEZVkxcZs-uDTGnqxGFGoZD5Ehmb57UZzpynpMEYwXv9QuxIlbdxSD0Cf3EcC1CQRKiqy6saBgIkoIh0vUqxXBb0M3LL_-dAVQB_26j99oRvngXvXECZmq_I0BN2WLNrZD6zLK1wuvvrP5nUjGA4Jo9DknKygR3EJV9IuNlURMRMKCYGHDry5gKhxUZXEI4vVrEQJs8G1wLQVDPjinBewW0hbleiR57abMRVrWianYjSQQIp9-CidzhL2wM')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-semibold truncate">Jane Smith</p>
+<p class="text-xs text-slate-500 truncate">Salon Owner</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Top Navbar -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 flex-shrink-0">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold">Messages</h2>
+<div class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs font-semibold text-slate-500">12 Unread</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative max-w-md hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-64 pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search conversations..." type="text"/>
+</div>
+<button class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Messaging Split View -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Conversation List -->
+<div class="w-80 md:w-96 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-4 flex gap-2 overflow-x-auto border-b border-slate-100 dark:border-slate-800">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary text-white text-xs font-medium">All Chats</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium">AI Handled</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium">Requiring Action</button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Chat Items -->
+<div class="p-4 flex items-center gap-3 bg-primary/5 border-l-4 border-primary cursor-pointer hover:bg-primary/10 transition-colors">
+<div class="size-12 rounded-full bg-slate-200 flex-shrink-0 bg-center bg-cover" data-alt="Sarah Jenkins profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBWJTbq41JzSMZ1tk6JA_UdxfOCvfbd6jNGhu0-gXiUDD8H5AJ_FFIqarkb3C6ikJDFqNkc56YGDVqplBJ3D43jGu1ulT_VN1AVicLPdcUmeK4fFHO2ZagI7zAIscS1kqGkzzYizYzfhdAr6BOiFnSw8_M-7XLGZBRsoZQ8nWnrPrdrE5IXdoqkDcHMhtqguE7-7bY-TzQYNb7V8xy_Bji5Qca6psGjAFy8O_1p9KCLJE9BvB2XJdjFeeQqqNgOOqTNFn7prwrQlZg')"></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h4 class="text-sm font-semibold truncate">Sarah Jenkins</h4>
+<span class="text-[10px] text-slate-400">10:45 AM</span>
+</div>
+<p class="text-xs text-slate-500 truncate">Can I reschedule my balayage appointment next Tuesday?</p>
+</div>
+</div>
+<div class="p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-12 rounded-full bg-slate-200 flex-shrink-0 bg-center bg-cover" data-alt="Michael Chen profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAyhDugafX_VpAkCSWBmoZemwZWKdbsWo7lMi-cNVriH4Dy7UnWFRVj3jhD7RSAmGRo4faJnj-TaakHlu6ONwgFbT68zP6_x5tJNiZ0ikdejva2uaF8mN6mieOG474eoFdSg5sylPAr6_tTwurE3T0pQHT39rsLRX3wU3rTmShpzopyRJ9TF1CT-LRz3hIx0EKGatOYjxfb6WBM7xV-udsDGooxZkAjBiBUXq3IDPWN9FOBh3oRJ5D2ahrM1-MbpK-uyGgyZFL6nlQ')"></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h4 class="text-sm font-semibold truncate">Michael Chen</h4>
+<span class="text-[10px] text-slate-400">9:30 AM</span>
+</div>
+<p class="text-xs text-slate-500 truncate">Thank you for the reminder! I'll be there.</p>
+</div>
+</div>
+<div class="p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-12 rounded-full bg-slate-200 flex-shrink-0 bg-center bg-cover" data-alt="Emily Rodriguez profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBm8pmxLFz41FXJHCsXg3M3vgsTyflI9w7Xa8_Z3V-Yg1rXXoK9aFdujo9sL6axvI8ZzSP9x-aD4RjL4zt0uP82JFD6Ous7jE0zmmbkuP17eIfMYzXK9VM8rkJbzFLdm4nzrcxbRNreS0ccLtgS5zQHCT2-_JnQt3VoxnYQOoXXipAgYAuLqmU2hVJqBmNhWSzQSW6DKn7yXKXueuUvc1XrrXUpyw_IIMugJTxcQJHIn1YemN29wYpe7_0QO7TXwH-QKgaDjxNJzKE')"></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h4 class="text-sm font-semibold truncate">Emily Rodriguez</h4>
+<span class="text-[10px] text-slate-400">Yesterday</span>
+</div>
+<p class="text-xs text-slate-500 truncate">Do you have any openings for a manicure tomorrow?</p>
+</div>
+<div class="size-2 rounded-full bg-primary"></div>
+</div>
+<div class="p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-12 rounded-full bg-slate-200 flex-shrink-0 bg-center bg-cover" data-alt="Lisa Thorne profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDreM2Tq_lyb5oWW9CMmLWkdsmNqehyOC0jKUOf07vqvKZZJV020ByxBcG2MNmuJGETPrPJCO6Q8M1CQGOZcfBKt-eZsLPpMDKCpyNM7HOY4Gk5QrXYi7gspS5o_KBr4V-SB3R0kNXYG2snhiV0MIcrNqCyqhFEi8rC2OGsfXeFB9-fEpzS7ThcprhljZEwsCBus7qDQO5zVL2WHizVYX_uLrZAn8jbjvwps8_JK_lRiX4BN255WtNzMk4MFUzHs8E4C1K4i2QJAoI')"></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h4 class="text-sm font-semibold truncate">Lisa Thorne</h4>
+<span class="text-[10px] text-slate-400">Yesterday</span>
+</div>
+<p class="text-xs text-slate-500 truncate">The hair color looks amazing! Thanks again.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Chat Window -->
+<div class="flex-1 flex flex-col bg-background-light dark:bg-background-dark">
+<!-- Chat Header -->
+<div class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 flex-shrink-0">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-200 bg-center bg-cover" data-alt="Active contact avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3DiBgSWLThTmRpJrRqmXlmCV3jbMaUuTcjuhEO8csIHskyLvt4BLi9ZxHXNCIaV4qG_9yt9mIy0DbS03WymUZrir5A576au6tOkNSy4eqSY8hvnMsLqJ5tjnV6oGhJzYhPcSI11ZjOXb7M7cpJKGm23xSD0rTx3BymOOkJShmYn_Xz5CwcQtYXWyHsiAoZvHkd8QZvSIDFg2pzCbYZbkItZb9shH9gkgZKrpLfc4rLKjPAzx6dSqXZoV6b43bZL5xPl5ZoqubzjE')"></div>
+<div>
+<h3 class="text-sm font-bold">Sarah Jenkins</h3>
+<div class="flex items-center gap-1">
+<span class="size-1.5 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Online</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<!-- Toggle: AI Active vs Manual Takeover -->
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-700 shadow-sm text-xs font-semibold text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                                    AI Active
+                                </button>
+<button class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-500 flex items-center gap-1.5 hover:text-slate-700 transition-colors">
+<span class="material-symbols-outlined text-sm">front_hand</span>
+                                    Manual Takeover
+                                </button>
+</div>
+<div class="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1"></div>
+<button class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+<span class="material-symbols-outlined">call</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-white/50 dark:bg-slate-800/50 px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- Customer Message -->
+<div class="flex flex-col gap-1 items-start max-w-[80%]">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-slate-500">CUSTOMER</span>
+<span class="text-[10px] text-slate-400">10:42 AM</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-slate-800 shadow-sm">
+<p class="text-sm">Hi! I have an appointment for a balayage next Tuesday at 2 PM, but I need to reschedule. Do you have anything later that week?</p>
+</div>
+</div>
+<!-- AI Assistant Message -->
+<div class="flex flex-col gap-1 items-end ml-auto max-w-[80%]">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] text-slate-400">10:43 AM</span>
+<span class="text-[10px] font-bold text-primary">AI ASSISTANT</span>
+</div>
+<div class="bg-primary text-white p-3 rounded-2xl rounded-tr-none shadow-md shadow-primary/20">
+<p class="text-sm">Hello Sarah! I can certainly help you with that. Checking our schedule for later next week... We have openings on Thursday at 3:30 PM and Friday at 10:00 AM. Would either of those work for you?</p>
+</div>
+</div>
+<!-- Customer Message -->
+<div class="flex flex-col gap-1 items-start max-w-[80%]">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-slate-500">CUSTOMER</span>
+<span class="text-[10px] text-slate-400">10:45 AM</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-slate-800 shadow-sm">
+<p class="text-sm">Thursday at 3:30 PM sounds perfect. Can you switch me to that slot?</p>
+</div>
+</div>
+<!-- AI Assistant Typing Indicator (Simulated) -->
+<div class="flex items-center gap-2 text-slate-400 italic text-xs animate-pulse">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                            AI Assistant is typing...
+                        </div>
+</div>
+<!-- Input Area -->
+<div class="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-end gap-3 bg-slate-100 dark:bg-slate-800 rounded-xl p-2">
+<button class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500">
+<span class="material-symbols-outlined">add</span>
+</button>
+<div class="flex-1 relative">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-sm py-2 resize-none placeholder:text-slate-500" placeholder="Type a message (AI is handling this chat)..." rows="1"></textarea>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500">
+<span class="material-symbols-outlined">mood</span>
+</button>
+<button class="bg-primary text-white p-2 rounded-lg flex items-center justify-center hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<div class="mt-2 flex items-center justify-center gap-1 text-[10px] text-slate-500 font-medium">
+<span class="material-symbols-outlined text-xs">info</span>
+                            AI is currently active. Messages you send will mark as manual takeover.
+                        </div>
+</div>
+</div>
+<!-- Detail Panel (Optional but adds to the look) -->
+<div class="hidden lg:flex w-72 flex-shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col overflow-y-auto">
+<div class="p-6 flex flex-col items-center text-center border-b border-slate-100 dark:border-slate-800">
+<div class="size-24 rounded-full bg-slate-200 mb-4 bg-center bg-cover border-4 border-slate-50 dark:border-slate-800" data-alt="Contact profile details photo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCwR7814pe5Svpq4ue6XWHvj3xq9rYsWVjl6Pb0tLRtE6vGUbpjJXDm_avtyGzAYskCIuYrvGFl5QGIR8RdA81BwWEiQrZZG4dNIxBysN7BlpIkC2vjB5d7pCB9flIpMgLekQQdlDW0b7np0EworzTTtInEfeb3OBDzAxu6xlc_QNeIeWTI1NACtYV3SJtf4Q2AEMQ2XOC7Nj7YW88u6_o034BpGFHnS-681LHdMUEjXtYSEvaUUFLAe82uEj0rBFdJcN6UV1FxuTQ')"></div>
+<h3 class="font-bold text-lg">Sarah Jenkins</h3>
+<p class="text-sm text-slate-500 mb-4">Member since May 2023</p>
+<div class="flex gap-2">
+<button class="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">Profile</button>
+<button class="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">History</button>
+</div>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div>
+<h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Next Appointment</h4>
+<div class="p-3 bg-primary/5 rounded-lg border border-primary/20">
+<p class="text-sm font-bold text-primary">Balayage &amp; Cut</p>
+<p class="text-xs text-slate-600 dark:text-slate-400">June 15, 2024 • 2:00 PM</p>
+<div class="mt-2 flex items-center gap-1 text-[10px] text-primary font-bold">
+<span class="material-symbols-outlined text-xs">history</span>
+                                    RESCHEDULING IN PROGRESS
+                                </div>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Customer Tags</h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-semibold text-slate-600 dark:text-slate-300">V.I.P.</span>
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-semibold text-slate-600 dark:text-slate-300">Color Regular</span>
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-semibold text-slate-600 dark:text-slate-300">Referral</span>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Media Shared</h4>
+<div class="grid grid-cols-3 gap-2">
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded bg-cover" data-alt="Shared hair style photo 1" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEUz8EFSDbCOlJoEYBoRrk9FKas3u128yqs8mctYxC-RP1Psv6NPWpBYu9DFravvVgJhsInz1QI19DX1f1erKGPf7Sm48M6fnYEUApN8PeS7FjhoCjTDzs7aYcgsTxXx7bntc-pAb82sRZYtkO3cQLiFb2RRjZy0ekhXhfvZIlFvOswm8USDYBP4faO9mXSskOfO42Bdt2t5LxPbrWxw1hEF9uymy5KMBOS8AY2s6km3eyFjoyszwz8Jm_NiWSCqHmLWJIA1p6FWE')"></div>
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded bg-cover" data-alt="Shared hair style photo 2" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBpJxZJuBDb-8jjVkuDXGuZpo-1Z_A213tH6ekXPJtfMD-OFyeMrAwV3yc2zbpAVjKefO8Z11-Wi7pKrC_0Te_b90AzO0wzDn5fX-EwqEotSilJ8E0kxjNc4gnmcyinblsWVyWx2wDbtxho6JQNojIP2JHs3t2JLUwLYVDEujoc_IlDLy8XUHcFYP7bnXxjpJNHT-G3jJcbyo0aHDBwKDHIVgnVTXYE5tOByV75bx0scpnugOE01mIiVQhu2JP2g1kb8pg2rC8CIt0')"></div>
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded bg-cover" data-alt="Shared hair style photo 3" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAOiogHyg4quuPnQkXrY8Otvno73O-iuHnLrJ0PsdImRzYvukz7jYmTVydyyWoP-qWZIXlhW3wnvwS5SMXD2JZeW4Uxp1S8S6Fvn6uAnPPg1_VcDwBQMXQSIs-PjDFkgKqy3jVmWzVf7lc9tSB4MRMLcis8yb7reklDkZu-vUfKtVX-a6anO02qNwhZ3btK2rq0f3WQVVnO1ko_Y1HR4-0u-b70SsTHPGonYQ-XzLy4LVHWkaOYs_JyJmcAlaOJQzuTcEgSYcIQOgo')"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
