@@ -9,9 +9,12 @@ export default async function CustomersPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
-  if (error) {
-    console.error("Error fetching customers:", error)
-  }
+  const { data: userData } = await supabase.auth.getUser()
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userData.user?.id)
+    .single()
 
-  return <CustomersClient customers={customers || []} />
+  return <CustomersClient customers={customers || []} profile={profile} />
 }

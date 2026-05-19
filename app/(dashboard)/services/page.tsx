@@ -10,9 +10,12 @@ export default async function ServicesPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
-  if (error) {
-    console.error("Error fetching services:", error)
-  }
+  const { data: userData } = await supabase.auth.getUser()
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userData.user?.id)
+    .single()
 
-  return <ServicesClient services={services || []} />
+  return <ServicesClient services={services || []} profile={profile} />
 }

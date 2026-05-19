@@ -9,9 +9,12 @@ export default async function CampaignsPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
-  if (error) {
-    console.error("Error fetching campaigns:", error)
-  }
+  const { data: userData } = await supabase.auth.getUser()
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userData.user?.id)
+    .single()
 
-  return <CampaignsClient campaigns={campaigns || []} />
+  return <CampaignsClient campaigns={campaigns || []} profile={profile} />
 }

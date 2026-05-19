@@ -13,8 +13,11 @@ import {
   MessageSquare,
   Bot,
   BarChart3,
+  ClipboardList as ClipboardListIcon,
   Scissors,
   Settings,
+  LogOut,
+  User as UserIcon,
 } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
@@ -26,11 +29,13 @@ interface TopBarProps {
   subtitle?: string
   searchPlaceholder?: string
   showNewBooking?: boolean
+  profile?: any
 }
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Appointments", href: "/appointments", icon: CalendarDays },
+  { name: "Calendar", href: "/calendar", icon: CalendarDays },
+  { name: "Appointments", href: "/appointments", icon: ClipboardListIcon },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Services", href: "/services", icon: Scissors },
   { name: "Campaigns", href: "/campaigns", icon: Megaphone },
@@ -44,10 +49,26 @@ export function TopBar({
   subtitle,
   searchPlaceholder = "Search bookings...",
   showNewBooking = false,
+  profile,
 }: TopBarProps) {
-  const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const pathname = usePathname()
+
+  // Mock notifications for appointments
+  const notifications = [
+    { id: 1, title: "New Booking", description: "Alice Smith - Hair Coloring", time: "5m ago", type: "new" },
+    { id: 2, title: "Booking Confirmed", description: "Bob Johnson - Manicure", time: "1h ago", type: "success" },
+    { id: 3, title: "Missed Appointment", description: "Charlie Brown - Haircut", time: "2h ago", type: "error" },
+  ]
+
+  const initials =
+    profile?.full_name
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase() || "U"
 
   return (
     <>
@@ -74,38 +95,106 @@ export function TopBar({
 
         {/* Right side */}
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Search */}
-          <div className="relative hidden sm:block">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+          {/* Notifications */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
               className={cn(
-                "h-9 w-40 rounded-lg border border-border bg-background pr-4 pl-9 text-sm md:w-64",
-                "placeholder:text-muted-foreground",
-                "focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none",
-                "transition-all"
+                "relative flex h-9 w-9 items-center justify-center rounded-lg border border-border transition-colors focus:outline-none",
+                isNotificationsOpen 
+                  ? "bg-accent text-foreground ring-2 ring-primary/20" 
+                  : "bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
-            />
+            >
+              <Bell className="h-4 w-4" />
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                {notifications.length}
+              </span>
+            </button>
+
+            {isNotificationsOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setIsNotificationsOpen(false)}
+                />
+                <div className="absolute right-0 z-20 mt-2 w-72 origin-top-right rounded-xl border border-border bg-card p-2 shadow-lg ring-1 ring-black/5 animate-in fade-in zoom-in duration-150">
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-border mb-1">
+                    <h3 className="text-sm font-bold text-foreground">Notifications</h3>
+                    <span className="text-[10px] font-medium text-primary hover:underline cursor-pointer">Mark all as read</span>
+                  </div>
+                  <div className="space-y-1">
+                    {notifications.map((n) => (
+                      <div 
+                        key={n.id} 
+                        className="flex flex-col gap-0.5 rounded-lg px-3 py-2 text-sm hover:bg-accent/50 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-foreground">{n.title}</span>
+                          <span className="text-[10px] text-muted-foreground">{n.time}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{n.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-1 border-t border-border pt-1">
+                    <button className="w-full py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors">
+                      View all activity
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Notifications */}
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-            <Bell className="h-4 w-4" />
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-              3
-            </span>
-          </button>
-
-          {/* New Booking */}
-          {showNewBooking && (
-            <button className="flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98] md:px-4">
-              <Plus className="h-4 w-4" />
-              <span className="hidden md:inline">New Booking</span>
+          {/* Profile Dropdown */}
+          <div className="relative ml-2 border-l border-border pl-2 md:ml-3 md:pl-3">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary ring-offset-background transition-all hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
+            >
+              {initials}
             </button>
-          )}
+
+            {isProfileOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsProfileOpen(false)}
+                />
+                <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right animate-in rounded-xl border border-border bg-card p-1 shadow-lg ring-1 ring-black/5 duration-150 fade-in zoom-in">
+                  <div className="mb-1 border-b border-border px-3 py-2">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {profile?.full_name || "User"}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      Manager
+                    </p>
+                  </div>
+
+                  <Link
+                    href="/settings"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+
+                  <button
+                    onClick={async () => {
+                      const { signOut } = await import("@/app/(auth)/actions")
+                      await signOut()
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-destructive transition-all hover:bg-destructive/10"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 

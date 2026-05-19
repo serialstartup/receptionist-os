@@ -33,8 +33,16 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Redirect unauthenticated users trying to access dashboard
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  // Define public routes that don't require authentication
+  const isPublicRoute = 
+    request.nextUrl.pathname === "/login" || 
+    request.nextUrl.pathname === "/register" ||
+    request.nextUrl.pathname.startsWith("/api/webhooks") ||
+    request.nextUrl.pathname === "/" ||
+    request.nextUrl.pathname.includes(".") // static files like favicon.ico
+
+  // Redirect unauthenticated users trying to access protected routes
+  if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)

@@ -4,7 +4,13 @@ import { useState, useEffect } from "react"
 import { Sidebar } from "./sidebar"
 import { cn } from "@/lib/utils"
 
-export function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
+export function DashboardLayoutWrapper({ 
+  children,
+  profile 
+}: { 
+  children: React.ReactNode
+  profile: any
+}) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -28,7 +34,7 @@ export function DashboardLayoutWrapper({ children }: { children: React.ReactNode
       return (
          <div className="min-h-screen bg-background">
             <div className="hidden md:block">
-              <Sidebar isCollapsed={false} onToggle={() => {}} />
+              <Sidebar profile={profile} isCollapsed={false} onToggle={() => {}} />
             </div>
             <main className="md:pl-60 transition-all duration-300">
                {children}
@@ -40,7 +46,7 @@ export function DashboardLayoutWrapper({ children }: { children: React.ReactNode
   return (
     <div className="min-h-screen bg-background">
       <div className="hidden md:block">
-        <Sidebar isCollapsed={isCollapsed} onToggle={handleToggle} />
+        <Sidebar profile={profile} isCollapsed={isCollapsed} onToggle={handleToggle} />
       </div>
       <main className={cn("transition-all duration-300", isCollapsed ? "md:pl-[80px]" : "md:pl-60")}>
         {children}

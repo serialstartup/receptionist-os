@@ -11,7 +11,11 @@ import {
   Bell,
   CheckCircle2,
   ExternalLink,
+  Settings as SettingsIcon,
+  Loader2,
 } from "lucide-react"
+import { updateBusiness, updateProfile } from "../actions"
+import { useRouter } from "next/navigation"
 
 type SettingsSection =
   | "profile"
@@ -21,8 +25,8 @@ type SettingsSection =
   | "notifications"
 
 const sections = [
-  { key: "profile" as const, label: "Profile", icon: User },
   { key: "business" as const, label: "Business Info", icon: Building2 },
+  { key: "profile" as const, label: "Your Profile", icon: User },
   { key: "billing" as const, label: "Billing", icon: CreditCard },
   { key: "notifications" as const, label: "Notifications", icon: Bell },
 ]
@@ -36,15 +40,49 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("business")
   const [isSaving, setIsSaving] = useState(false)
+  const router = useRouter()
 
-  const handleSave = () => {
+  // Business state
+  const [businessData, setBusinessData] = useState({
+    name: business?.name || "",
+    timezone: business?.timezone || "UTC",
+  })
+
+  // Profile state
+  const [profileData, setProfileData] = useState({
+    full_name: profile?.full_name || "",
+  })
+
+  const handleSaveBusiness = async () => {
+    if (!business?.id) return
     setIsSaving(true)
-    setTimeout(() => setIsSaving(false), 1000)
+    try {
+      await updateBusiness(business.id, businessData)
+      router.refresh()
+    } catch (error) {
+      console.error("Error updating business:", error)
+      alert("Failed to save business settings.")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true)
+    try {
+      await updateProfile(profileData)
+      router.refresh()
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      alert("Failed to save profile settings.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
     <div>
-      <TopBar title="Settings" />
+      <TopBar title="Settings" profile={profile} />
 
       <div className="flex min-h-[calc(100vh-64px)] flex-col border-t border-border md:flex-row">
         {/* Content */}
@@ -95,17 +133,8 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={business?.name || ""}
-                        className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-foreground">
-                        Industry / Category
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue={business?.industry || "Salon"}
+                        value={businessData.name}
+                        onChange={(e) => setBusinessData({ ...businessData, name: e.target.value })}
                         className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                       />
                     </div>
@@ -124,13 +153,15 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
                       <label className="mb-1 block text-xs font-medium text-foreground">
                         Timezone
                       </label>
-                      <select className="mt-1 w-full cursor-pointer rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
+                      <select 
+                        value={businessData.timezone}
+                        onChange={(e) => setBusinessData({ ...businessData, timezone: e.target.value })}
+                        className="mt-1 w-full cursor-pointer rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                      >
                         <option value="UTC">UTC</option>
                         <option value="EST">EST</option>
                         <option value="PST">PST</option>
-                        <option value="AUTO">
-                          Auto-detect ({business?.timezone || "UTC"})
-                        </option>
+                        <option value="Europe/Istanbul">Europe/Istanbul</option>
                       </select>
                     </div>
                   </div>
@@ -141,10 +172,22 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
                     Discard
                   </button>
                   <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70"
+                    onClick={() => {
+                      setBusinessData({
+                        name: business?.name || "",
+                        timezone: business?.timezone || "UTC",
+                      })
+                    }}
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                   >
+                    Discard
+                  </button>
+                  <button
+                    onClick={handleSaveBusiness}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70"
+                  >
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                     {isSaving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
@@ -229,10 +272,57 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
             </div>
           )}
 
-          {activeSection !== "business" && (
+          {activeSection === "profile" && (
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Personal Profile</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Manage your account information and preferences.</p>
+
+              <div className="mt-6 rounded-xl border border-border bg-card p-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Full Name</label>
+                    <input
+                      type="text"
+                      value={profileData.full_name}
+                      onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email Address</label>
+                    <input
+                      type="email"
+                      readOnly
+                      defaultValue={profile?.email || ""}
+                      className="w-full cursor-not-allowed rounded-lg border border-border bg-muted px-4 py-2.5 text-sm text-muted-foreground outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-8 flex justify-end gap-3 border-t border-border pt-6">
+                  <button 
+                    onClick={() => setProfileData({ full_name: profile?.full_name || "" })}
+                    className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition-colors"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-70 transition-all shadow-lg shadow-primary/20"
+                  >
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {isSaving ? "Saving..." : "Update Profile"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeSection !== "business" && activeSection !== "profile" && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                <Building2 className="h-8 w-8" />
+                <SettingsIcon className="h-8 w-8" />
               </div>
               <h3 className="text-lg font-bold text-foreground">
                 Section Unavailable

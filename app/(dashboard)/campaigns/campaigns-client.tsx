@@ -19,6 +19,7 @@ import {
   Loader2,
   Zap,
   ChevronRight,
+  Search,
   Scissors as ScissorsIcon
 } from "lucide-react"
 import { createCampaign } from "../actions"
@@ -28,6 +29,7 @@ type TabFilter = "all" | "active" | "draft" | "completed"
 
 interface CampaignsClientProps {
   campaigns: any[]
+  profile?: any
 }
 
 const statusStyles: Record<string, string> = {
@@ -37,8 +39,9 @@ const statusStyles: Record<string, string> = {
   PAUSED: "text-warning bg-warning/10",
 }
 
-export function CampaignsClient({ campaigns }: CampaignsClientProps) {
+export function CampaignsClient({ campaigns, profile }: CampaignsClientProps) {
   const [activeTab, setActiveTab] = useState<TabFilter>("all")
+  const [searchQuery, setSearchQuery] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -121,6 +124,11 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
   }
 
   const filteredCampaigns = campaigns.filter(c => {
+    const searchLower = searchQuery.toLowerCase()
+    const matchesSearch = c.name?.toLowerCase().includes(searchLower)
+    
+    if (!matchesSearch) return false
+
     if (activeTab === "all") return true
     return c.status?.toLowerCase() === activeTab
   })
@@ -132,10 +140,10 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
 
   return (
     <div>
-      <TopBar
-        title="AI Marketing Campaigns"
-        subtitle="Grow your business with smart automated messaging."
-        searchPlaceholder="Search campaigns..."
+      <TopBar 
+        title="Campaigns" 
+        searchPlaceholder="Search by campaign name..."
+        profile={profile}
       />
 
       <div className="p-6">
@@ -148,6 +156,18 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
             <div>
                <p className="text-sm font-semibold text-foreground">AI Distributor Active</p>
                <p className="text-xs text-muted-foreground">Smart dispatching enabled for optimum booking rates</p>
+            </div>
+          </div>
+          <div className="flex flex-1 items-center gap-4 w-full sm:w-auto">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search campaigns..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 w-full rounded-lg border border-border bg-background pr-4 pl-9 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+              />
             </div>
           </div>
           <div className="flex gap-3">
@@ -181,9 +201,9 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
           />
           <StatsCard
             title="Campaign Revenue"
-            value={"$Data Sync"}
+            value={`$0`}
             icon={DollarSign}
-            subtitle="Pending integration"
+            subtitle="Tracking starting soon"
           />
         </div>
 
@@ -215,13 +235,16 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
         )}
 
         {/* List / Empty State */}
-        {campaigns.length === 0 ? (
+        {campaigns.length === 0 || filteredCampaigns.length === 0 ? (
           <div className="mt-8">
             <EmptyState 
               icon={MessageSquare}
-              title="No campaigns running"
-              description="Start reaching out to your clients using our AI distributor. Create a campaign to see it here."
-              action={
+              title={campaigns.length === 0 ? "No campaigns running" : "No results found"}
+              description={campaigns.length === 0 
+                ? "Start reaching out to your clients using our AI distributor. Create a campaign to see it here."
+                : `We couldn't find any campaigns matching "${searchQuery}".`
+              }
+              action={campaigns.length === 0 && (
                 <button 
                   onClick={() => setIsModalOpen(true)}
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
@@ -229,7 +252,7 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                   <Plus className="h-4 w-4 inline mr-2" />
                   Create First Campaign
                 </button>
-              }
+              )}
             />
           </div>
         ) : (
@@ -475,10 +498,11 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                   )}
                 </button>
               </div>
-            )}
-          </div>
+            </form>
+          )}
         </div>
-      )}
-    </div>
-  )
+      </div>
+    )}
+  </div>
+)
 }

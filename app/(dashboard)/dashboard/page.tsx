@@ -20,13 +20,28 @@ export default async function DashboardPage() {
   const [
     { data: appointments },
     { data: customers },
+    { data: userData },
+    { data: allAppts },
   ] = await Promise.all([
     supabase.from("appointments").select("id, start_time, status, service_id, services(name), customers(name)").order("start_time", { ascending: true }),
     supabase.from("customers").select("id, name, created_at, phone").order("created_at", { ascending: false }).limit(5),
+    supabase.auth.getUser(),
+    supabase.from("appointments").select("services(price)"),
   ])
 
-  // Process data for Stats (in a real app, you would sum real services and revenues)
-  // Since this is MVP, we calculate based on the available data simply.
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userData.user?.id)
+    .single()
+
+  // Calculate Total Revenue
+  const totalRevenue = allAppts?.reduce((acc, appt) => {
+    const service = Array.isArray(appt.services) ? appt.services[0] : appt.services
+    return acc + (service?.price || 0)
+  }, 0) || 0
+
+  // Process data for Stats
   const appts = appointments || []
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -56,7 +71,7 @@ export default async function DashboardPage() {
       <TopBar
         title="Dashboard"
         searchPlaceholder="Search bookings..."
-        showNewBooking
+        profile={profile}
       />
 
       <div className="p-6">
@@ -79,6 +94,12 @@ export default async function DashboardPage() {
             value={customers?.length || 0}
             icon={Users}
             subtitle="Total customers added"
+          />
+          <StatsCard
+            title="Total Revenue"
+            value={`$${totalRevenue.toLocaleString()}`}
+            icon={DollarSign}
+            trend={{ value: "All time earnings", positive: true }}
           />
         </div>
 

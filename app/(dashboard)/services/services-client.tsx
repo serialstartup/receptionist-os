@@ -5,13 +5,14 @@ import { TopBar } from "@/components/dashboard/top-bar"
 import { EmptyState } from "@/components/ui/empty-state"
 import { cn } from "@/lib/utils"
 import { Plus, Pencil, Trash2, Search, Scissors, X, Loader2 } from "lucide-react"
-import { createService } from "../actions"
+import { createService, updateService, deleteService } from "../actions"
 import { useRouter } from "next/navigation"
 
 type Category = "all" | "hair" | "nails" | "skin" | "massage"
 
 interface ServicesClientProps {
   services: any[]
+  profile?: any
 }
 
 const categoryColors: Record<string, string> = {
@@ -21,7 +22,7 @@ const categoryColors: Record<string, string> = {
   SKIN: "bg-chart-1/10 text-chart-1",
 }
 
-export function ServicesClient({ services }: ServicesClientProps) {
+export function ServicesClient({ services, profile }: ServicesClientProps) {
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [searchQuery, setSearchQuery] = useState("")
   // Set the first service as safely selected if array exists, otherwise null
@@ -30,6 +31,7 @@ export function ServicesClient({ services }: ServicesClientProps) {
   )
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -41,18 +43,49 @@ export function ServicesClient({ services }: ServicesClientProps) {
 
   const router = useRouter()
 
+  const handleEdit = (service: any) => {
+    setFormData({
+      name: service.name,
+      category: service.category || "HAIR",
+      price: service.price.toString(),
+      duration_minutes: service.duration_minutes.toString(),
+      description: service.description || "",
+    })
+    setIsEditing(true)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this service?")) return
+    try {
+      await deleteService(id)
+      router.refresh()
+    } catch (error) {
+      console.error("Error deleting service:", error)
+      alert("Failed to delete service.")
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      await createService({
+      const payload = {
         name: formData.name,
         category: formData.category,
         price: parseFloat(formData.price),
         duration_minutes: parseInt(formData.duration_minutes),
         description: formData.description,
-      })
+      }
+
+      if (isEditing && selectedService) {
+        await updateService(selectedService.id, payload)
+      } else {
+        await createService(payload)
+      }
+
       setIsModalOpen(false)
+      setIsEditing(false)
       setFormData({
         name: "",
         category: "HAIR",
@@ -62,8 +95,8 @@ export function ServicesClient({ services }: ServicesClientProps) {
       })
       router.refresh()
     } catch (error) {
-      console.error("Error creating service:", error)
-      alert("Failed to create service. Please try again.")
+      console.error("Error saving service:", error)
+      alert("Failed to save service. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -95,9 +128,32 @@ export function ServicesClient({ services }: ServicesClientProps) {
       />
 
       <div className="p-6">
-        <div className="flex items-center justify-end">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 items-center gap-4 w-full sm:w-auto">
+            <h2 className="text-lg font-bold text-foreground">Services Menu</h2>
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 w-full rounded-lg border border-border bg-background pr-4 pl-9 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+              />
+            </div>
+          </div>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsEditing(false)
+              setFormData({
+                name: "",
+                category: "HAIR",
+                price: "",
+                duration_minutes: "30",
+                description: "",
+              })
+              setIsModalOpen(true)
+            }}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all"
           >
             <Plus className="h-4 w-4" />
@@ -105,20 +161,23 @@ export function ServicesClient({ services }: ServicesClientProps) {
           </button>
         </div>
 
-        {services.length === 0 ? (
+        {services.length === 0 || filteredServices.length === 0 ? (
           <div className="mt-6">
             <EmptyState 
               icon={Scissors}
-              title="No services offered yet"
-              description="Your menu is currently empty. Add the services you offer to start accepting appointments."
-              action={
+              title={services.length === 0 ? "No services offered yet" : "No results found"}
+              description={services.length === 0 
+                ? "Your menu is currently empty. Add the services you offer to start accepting appointments."
+                : `We couldn't find any services matching "${searchQuery}".`
+              }
+              action={services.length === 0 && (
                 <button 
                   onClick={() => setIsModalOpen(true)}
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                 >
                   Add Service
                 </button>
-              }
+              )}
             />
           </div>
         ) : (
@@ -126,7 +185,7 @@ export function ServicesClient({ services }: ServicesClientProps) {
             {/* Services Table */}
             <div className="col-span-1 overflow-hidden rounded-xl border border-border bg-card lg:col-span-2 flex flex-col min-h-[500px]">
               {/* Category Filters + Search */}
-              <div className="flex flex-col items-start gap-4 border-b border-border px-6 py-4 sm:flex-row sm:items-center">
+              <div className="flex flex-col items-start gap-4 border-b border-border px-6 py-4">
                 <div className="flex flex-wrap items-center gap-1">
                   {(["all", "hair", "nails", "skin", "massage"] as Category[]).map(
                     (cat) => (
@@ -144,16 +203,6 @@ export function ServicesClient({ services }: ServicesClientProps) {
                       </button>
                     )
                   )}
-                </div>
-                <div className="relative flex-1">
-                  <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Find a service..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 w-full rounded-lg border border-border bg-background pr-4 pl-9 text-sm placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
-                  />
                 </div>
               </div>
 
@@ -223,10 +272,22 @@ export function ServicesClient({ services }: ServicesClientProps) {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEdit(service)
+                              }}
+                              className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                            >
                               <Pencil className="h-4 w-4" />
                             </button>
-                            <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDelete(service.id)
+                              }}
+                              className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
@@ -269,7 +330,10 @@ export function ServicesClient({ services }: ServicesClientProps) {
 
                   {/* Staff Assignment & Buffer removed for MVP as per plan */}
 
-                  <button className="w-full rounded-lg bg-accent py-2.5 text-sm font-semibold text-primary hover:bg-accent/80 transition-colors mt-4">
+                  <button 
+                    onClick={() => handleEdit(selectedService)}
+                    className="w-full rounded-lg bg-accent py-2.5 text-sm font-semibold text-primary hover:bg-accent/80 transition-colors mt-4"
+                  >
                     Edit Details
                   </button>
                 </div>
@@ -289,7 +353,9 @@ export function ServicesClient({ services }: ServicesClientProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-lg animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-foreground">Add New Service</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                {isEditing ? "Edit Service" : "Add New Service"}
+              </h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="rounded-lg p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
@@ -383,20 +449,20 @@ export function ServicesClient({ services }: ServicesClientProps) {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-70 transition-all flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    "Create Service"
-                  )}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-70 transition-all flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {isEditing ? "Saving..." : "Creating..."}
+                      </>
+                    ) : (
+                      isEditing ? "Save Changes" : "Create Service"
+                    )}
+                  </button>
               </div>
             </form>
           </div>

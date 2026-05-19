@@ -2,14 +2,26 @@
 
 import { useState, useMemo } from "react"
 import { cn } from "@/lib/utils"
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Clock, X, User, Tag, AlignLeft, Info, Phone, Calendar as CalendarIcon, Hash } from "lucide-react"
 
 interface Appointment {
   id: string
   start_time: string
   end_time: string
-  customers?: { name: string }
-  services?: { name: string; color?: string }
+  status: string
+  source?: string
+  notes?: string
+  customers?: { 
+    name: string
+    phone?: string
+    email?: string
+  }
+  services?: { 
+    name: string
+    price?: number
+    duration_minutes?: number
+    color?: string 
+  }
 }
 
 interface AdvancedCalendarProps {
@@ -21,6 +33,15 @@ const INTERVALS = [0, 15, 30, 45]
 
 export function AdvancedCalendar({ appointments }: AdvancedCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
+
+  const statusStyles: Record<string, string> = {
+    scheduled: "text-warning bg-warning/10 border-warning/20",
+    confirmed: "text-success bg-success/10 border-success/20",
+    completed: "text-muted-foreground bg-muted border-border",
+    cancelled: "text-destructive bg-destructive/10 border-destructive/20",
+    "no-show": "text-destructive bg-destructive/10 border-destructive/20",
+  }
 
   // Calculate start of the week (Monday)
   const startOfWeek = useMemo(() => {
@@ -175,6 +196,7 @@ export function AdvancedCalendar({ appointments }: AdvancedCalendarProps) {
                     <div
                       key={appt.id}
                       style={style}
+                      onClick={() => setSelectedAppointment(appt)}
                       className="absolute pointer-events-auto rounded-md border border-primary/20 bg-primary/10 p-1.5 shadow-sm overflow-hidden hover:bg-primary/20 hover:border-primary/40 transition-all cursor-pointer group"
                     >
                       <div className="flex flex-col h-full">
@@ -198,6 +220,111 @@ export function AdvancedCalendar({ appointments }: AdvancedCalendarProps) {
           </div>
         </div>
       </div>
+
+      {/* Appointment Detail Modal Overlay */}
+
+      {selectedAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div 
+            className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="relative h-32 bg-primary/5 border-b border-border flex items-center justify-center">
+              <div className="absolute top-4 right-4">
+                <button 
+                  onClick={() => setSelectedAppointment(null)}
+                  className="rounded-full bg-background/80 p-1.5 text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="bg-primary/10 p-4 rounded-full">
+                <CalendarIcon className="h-10 w-10 text-primary" />
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Header Info */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className={cn(
+                    "px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border",
+                    statusStyles[selectedAppointment.status] || statusStyles.scheduled
+                  )}>
+                    {selectedAppointment.status}
+                  </span>
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    Source: {selectedAppointment.source || "Manual"}
+                  </span>
+                </div>
+                <h4 className="text-xl font-bold text-foreground">
+                  {selectedAppointment.services?.name}
+                </h4>
+              </div>
+
+              {/* Details Grid */}
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1 bg-accent/50 p-1.5 rounded-lg">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Customer</p>
+                    <p className="text-sm font-semibold text-foreground">{selectedAppointment.customers?.name}</p>
+                    {selectedAppointment.customers?.phone && (
+                      <div className="flex items-center gap-1.5 mt-1 text-xs text-primary">
+                        <Phone className="h-3 w-3" />
+                        <span>{selectedAppointment.customers.phone}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="mt-1 bg-accent/50 p-1.5 rounded-lg">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Time & Duration</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {new Date(selectedAppointment.start_time).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(selectedAppointment.start_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} - {new Date(selectedAppointment.end_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} 
+                      ({selectedAppointment.services?.duration_minutes} mins)
+                    </p>
+                  </div>
+                </div>
+
+                {selectedAppointment.notes && (
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 bg-accent/50 p-1.5 rounded-lg">
+                      <AlignLeft className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Notes</p>
+                      <p className="text-sm text-foreground leading-relaxed italic">"{selectedAppointment.notes}"</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-8 flex gap-3">
+                <button 
+                  onClick={() => setSelectedAppointment(null)}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-accent transition-colors"
+                >
+                  Close
+                </button>
+                <button className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                  Reschedule
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

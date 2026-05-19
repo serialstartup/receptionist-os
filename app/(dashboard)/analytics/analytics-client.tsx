@@ -21,11 +21,9 @@ import {
 type TimeRange = "today" | "7days" | "30days" | "custom"
 
 interface AnalyticsClientProps {
-  metrics: {
-    totalRevenue: number
-    totalAppointments: number
-    totalCustomers: number
-  }
+  appointments: any[]
+  customersCount: number
+  profile: any
 }
 
 // Mock Data for Charts
@@ -52,8 +50,33 @@ const popularServices = [
   { name: "Facial Treatment", count: 98 },
 ]
 
-export function AnalyticsClient({ metrics }: AnalyticsClientProps) {
+export function AnalyticsClient({ appointments, customersCount, profile }: AnalyticsClientProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("7days")
+
+  const filteredAppointments = appointments.filter((appt) => {
+    const apptDate = new Date(appt.start_time)
+    const now = new Date()
+
+    if (timeRange === "today") {
+      return apptDate.toDateString() === now.toDateString()
+    } else if (timeRange === "7days") {
+      const sevenDaysAgo = new Date(now)
+      sevenDaysAgo.setDate(now.getDate() - 7)
+      return apptDate >= sevenDaysAgo && apptDate <= now
+    } else if (timeRange === "30days") {
+      const thirtyDaysAgo = new Date(now)
+      thirtyDaysAgo.setDate(now.getDate() - 30)
+      return apptDate >= thirtyDaysAgo && apptDate <= now
+    }
+    return true
+  })
+
+  const totalRevenue = filteredAppointments.reduce((acc, appt) => {
+    const service = Array.isArray(appt.services) ? appt.services[0] : appt.services
+    return acc + (service?.price || 0)
+  }, 0)
+
+  const appointmentsCount = filteredAppointments.length
 
   return (
     <div>
@@ -61,6 +84,7 @@ export function AnalyticsClient({ metrics }: AnalyticsClientProps) {
         title="Analytics Overview"
         subtitle="Monitor your salon's performance and growth metrics."
         searchPlaceholder="Search analytics..."
+        profile={profile}
       />
 
       <div className="p-6">
@@ -71,7 +95,7 @@ export function AnalyticsClient({ metrics }: AnalyticsClientProps) {
               { key: "today", label: "Today" },
               { key: "7days", label: "Last 7 Days" },
               { key: "30days", label: "Last 30 Days" },
-              { key: "custom", label: "Custom" },
+              { key: "custom", label: "All Time" },
             ] as const
           ).map((range) => (
             <button
@@ -92,20 +116,20 @@ export function AnalyticsClient({ metrics }: AnalyticsClientProps) {
         {/* KPI Cards */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="Total Revenue (All Time)"
-            value={`$${metrics.totalRevenue.toLocaleString()}`}
+            title={`Revenue (${timeRange})`}
+            value={`$${totalRevenue.toLocaleString()}`}
             icon={DollarSign}
             trend={{ value: "Based on real data", positive: true }}
           />
           <StatsCard
-            title="Total Appointments"
-            value={metrics.totalAppointments.toLocaleString()}
+            title="Appointments"
+            value={appointmentsCount.toLocaleString()}
             icon={CalendarCheck}
-            subtitle="Scheduled & Completed"
+            subtitle={timeRange === "custom" ? "All Time" : `InRange: ${timeRange}`}
           />
           <StatsCard
             title="Total Client Base"
-            value={metrics.totalCustomers.toLocaleString()}
+            value={customersCount.toLocaleString()}
             icon={Users}
             subtitle="Registered Customers"
           />
