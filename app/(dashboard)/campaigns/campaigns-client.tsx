@@ -22,8 +22,16 @@ import {
   Search,
   Scissors as ScissorsIcon
 } from "lucide-react"
-import { createCampaign } from "../actions"
+import { createCampaign, executeCampaign, updateCampaign, deleteCampaign } from "../actions"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type TabFilter = "all" | "active" | "draft" | "completed"
 
@@ -50,6 +58,21 @@ export function CampaignsClient({ campaigns, profile }: CampaignsClientProps) {
     discount_value: "10",
   })
   const [showAiSuggestions, setShowAiSuggestions] = useState(false)
+  const [sendingCampaignId, setSendingCampaignId] = useState<string | null>(null)
+
+  const handleSendCampaign = async (campaignId: string) => {
+    if (!confirm("Send this campaign to all customers with a phone number?")) return
+    setSendingCampaignId(campaignId)
+    try {
+      const result = await executeCampaign(campaignId)
+      toast.success(`Campaign sent to ${result.sent} customers.`)
+      router.refresh()
+    } catch (error: any) {
+      toast.error(`Failed to send campaign: ${error.message}`)
+    } finally {
+      setSendingCampaignId(null)
+    }
+  }
 
   const aiSuggestions = [
     {
@@ -117,7 +140,7 @@ export function CampaignsClient({ campaigns, profile }: CampaignsClientProps) {
       router.refresh()
     } catch (error) {
       console.error("Error creating campaign:", error)
-      alert("Failed to create campaign. Please try again.")
+      toast.error("Failed to create campaign. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -350,9 +373,71 @@ export function CampaignsClient({ campaigns, profile }: CampaignsClientProps) {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <button
+                          onClick={() => handleSendCampaign(campaign.id)}
+                          disabled={sendingCampaignId === campaign.id}
+                          className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {sendingCampaignId === campaign.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Zap className="h-3 w-3" />
+                          )}
+                          Send Now
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                try {
+                                  await updateCampaign(campaign.id, { status: "PAUSED" })
+                                  toast.success("Campaign paused.")
+                                  router.refresh()
+                                } catch {
+                                  toast.error("Failed to update campaign.")
+                                }
+                              }}
+                            >
+                              Pause
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                try {
+                                  await updateCampaign(campaign.id, { status: "ACTIVE" })
+                                  toast.success("Campaign activated.")
+                                  router.refresh()
+                                } catch {
+                                  toast.error("Failed to update campaign.")
+                                }
+                              }}
+                            >
+                              Activate
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={async () => {
+                                if (!confirm("Delete this campaign?")) return
+                                try {
+                                  await deleteCampaign(campaign.id)
+                                  toast.success("Campaign deleted.")
+                                  router.refresh()
+                                } catch {
+                                  toast.error("Failed to delete campaign.")
+                                }
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </td>
                   </tr>
                 ))}

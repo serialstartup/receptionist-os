@@ -102,29 +102,9 @@ export async function POST(request: Request) {
               content: messageText,
             })
 
-            // Process with AI Agent (if enabled)
+            // Process with AI Agent (if enabled) — agent handles sending back
             if (conversation.ai_enabled) {
-              const aiResponse = await processConversationMessage(conversation.id)
-
-              if (aiResponse) {
-                // Send back to Instagram via Send API
-                const igToken = integration.ig_access_token
-                if (igToken) {
-                  await fetch(
-                    `https://graph.facebook.com/v21.0/me/messages?access_token=${igToken}`,
-                    {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        recipient: { id: senderId },
-                        message: { text: aiResponse },
-                      }),
-                    }
-                  )
-                } else {
-                  console.log("No IG token, cannot send reply to", senderId)
-                }
-              }
+              await processConversationMessage(conversation.id)
             }
           }
         }

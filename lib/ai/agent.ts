@@ -22,22 +22,26 @@ export async function processConversationMessage(conversationId: string) {
   const { data: conversation } = await supabase
     .from("conversations")
     .select(`
-      id, 
-      business_id, 
-      customer_id, 
-      platform, 
-      current_state, 
+      id,
+      business_id,
+      customer_id,
+      platform,
+      platform_conversation_id,
+      current_state,
       ai_enabled,
-      customers(name, phone),
-      businesses(name, location, timezone, working_hours_start, working_hours_end)
+      customers(name, phone, instagram_id),
+      businesses(name, location, timezone, working_hours_start, working_hours_end, ai_instructions, ai_tone, ai_language, ai_emoji_enabled, ai_enabled)
     `)
     .eq("id", conversationId)
     .single()
 
-  if (!conversation || !conversation.ai_enabled) return null
+  if (!conversation) return null
 
   const business = conversation.businesses as any
   const customer = conversation.customers as any
+
+  // Respect per-conversation ai_enabled and global business ai_enabled
+  if (!conversation.ai_enabled || business?.ai_enabled === false) return null
 
   // 2. Fetch last 10 messages for context (Context Builder)
   const { data: historyData } = await supabase
@@ -53,15 +57,27 @@ export async function processConversationMessage(conversationId: string) {
     content: m.content || "",
   }))
 
-  // 3. Construct System Prompt (Deterministic Rules)
-  const systemPrompt = `You are the AI Receptionist for "${business.name}" (${business.location}).
-Current State: ${conversation.current_state}
+  // 3. Construct System Prompt (dynamic instructions from DB)
+  const toneMap: Record<string, string> = {
+    friendly: "Friendly and warm",
+    professional: "Professional and polite",
+    luxury: "Sophisticated and exclusive",
+    energetic: "Energetic and upbeat",
+  }
+  const tone = toneMap[business.ai_tone ?? "friendly"] ?? "Friendly and warm"
+  const emojiNote = business.ai_emoji_enabled === false ? "Do not use emojis." : "You may use emojis occasionally."
+  const customInstructions = business.ai_instructions
+    ? `\n\nBusiness Instructions:\n${business.ai_instructions}`
+    : ""
+
+  const systemPrompt = `You are the AI Receptionist for "${business.name}"${business.location ? ` (${business.location})` : ""}.
+Tone: ${tone}. ${emojiNote}
+Current booking state: ${conversation.current_state}
 Rules:
 - Today's date is: ${format(new Date(), "yyyy-MM-dd")}.
-- Hours: ${business.working_hours_start} to ${business.working_hours_end}.
-- USE TOOLS for pricing and slots. NEVER guess.
-- If the customer is choosing a service, focus on that until confirmed.
-- Keep responses short for ${conversation.platform}.`
+- Business hours: ${business.working_hours_start} to ${business.working_hours_end}.
+- USE TOOLS for service pricing and available slots. NEVER guess availability.
+- Keep responses concise for ${conversation.platform}.${customInstructions}`
 
   // 4. Run AI Completion
   const response = await openai.chat.completions.create({
@@ -97,10 +113,110 @@ Rules:
         result = JSON.stringify(slots)
         newState = "COLLECT_TIME"
       } else if (toolCall.function.name === "createAppointment") {
-        // Logic to final check and book
-        const success = true // Simplified for example, real logic calls createAppointmentSafely
-        result = JSON.stringify({ success, message: "Booked!" })
-        newState = "START" // Reset after booking
+        try {
+          const { data: service } = await supabase
+            .from("services")
+            .select("duration_minutes")
+            .eq("id", args.service_id)
+            .single()
+
+          if (!service) {
+            result = JSON.stringify({ success: false, message: "Service not found." })
+          } else {
+            const startDt = parseISO(`${args.date}T${args.time}:00`)
+            const endDt = addMinutes(startDt, service.duration_minutes)
+            const startTime = startDt.toISOString()
+            const endTime = endDt.toISOString()
+
+            // Find a free staff member for the requested slot
+            const { data: staff } = await supabase
+              .from("staff")
+              .select("id")
+              .eq("business_id", conversation.business_id)
+              .eq("is_active", true)
+
+            let bookedStaffId: string | null = null
+            for (const member of (staff || [])) {
+              const { data: conflicts } = await supabase
+                .from("appointments")
+                .select("id")
+                .eq("business_id", conversation.business_id)
+                .eq("staff_id", member.id)
+                .neq("status", "cancelled")
+                .lt("start_time", endTime)
+                .gt("end_time", startTime)
+
+              if (!conflicts || conflicts.length === 0) {
+                bookedStaffId = member.id
+                break
+              }
+            }
+
+            if (!bookedStaffId) {
+              result = JSON.stringify({ success: false, message: "No available staff for that time. Please choose another slot." })
+            } else {
+              const { error: insertError } = await supabase
+                .from("appointments")
+                .insert({
+                  business_id: conversation.business_id,
+                  customer_id: conversation.customer_id,
+                  service_id: args.service_id,
+                  staff_id: bookedStaffId,
+                  start_time: startTime,
+                  end_time: endTime,
+                  status: "confirmed",
+                  source: conversation.platform,
+                })
+
+              if (insertError) {
+                result = JSON.stringify({ success: false, message: "Failed to book appointment. Please try again." })
+              } else {
+                result = JSON.stringify({ success: true, message: `Appointment confirmed for ${args.date} at ${args.time}.` })
+                newState = "DONE"
+              }
+            }
+          }
+        } catch {
+          result = JSON.stringify({ success: false, message: "An error occurred while booking." })
+        }
+      } else if (toolCall.function.name === "cancelAppointment") {
+        try {
+          const { data: cust } = await supabase
+            .from("customers")
+            .select("id")
+            .eq("business_id", conversation.business_id)
+            .eq("phone", args.customer_phone)
+            .maybeSingle()
+
+          if (!cust) {
+            result = JSON.stringify({ success: false, message: "No customer found with that phone number." })
+          } else {
+            const { data: appt } = await supabase
+              .from("appointments")
+              .select("id, start_time")
+              .eq("business_id", conversation.business_id)
+              .eq("customer_id", cust.id)
+              .in("status", ["scheduled", "confirmed"])
+              .gte("start_time", new Date().toISOString())
+              .order("start_time", { ascending: true })
+              .limit(1)
+              .maybeSingle()
+
+            if (!appt) {
+              result = JSON.stringify({ success: false, message: "No upcoming appointment found to cancel." })
+            } else {
+              await supabase
+                .from("appointments")
+                .update({ status: "cancelled" })
+                .eq("id", appt.id)
+
+              result = JSON.stringify({ success: true, message: "Appointment cancelled successfully." })
+              newState = "START"
+            }
+          }
+        } catch {
+          result = JSON.stringify({ success: false, message: "An error occurred while cancelling." })
+        }
       }
 
       toolCallResults.push({
@@ -143,6 +259,21 @@ Rules:
     if (conversation.platform === "whatsapp") {
       const { whatsapp } = await import("@/lib/whatsapp/client")
       await whatsapp.sendMessage(customer.phone, finalContent)
+    } else if (conversation.platform === "instagram") {
+      const { data: integration } = await supabase
+        .from("business_integrations")
+        .select("ig_access_token")
+        .eq("business_id", conversation.business_id)
+        .eq("is_active", true)
+        .maybeSingle()
+
+      if (integration?.ig_access_token) {
+        const recipientId = (conversation as any).platform_conversation_id ?? customer.instagram_id
+        if (recipientId) {
+          const { instagram } = await import("@/lib/instagram/client")
+          await instagram.sendMessage(recipientId, finalContent, integration.ig_access_token)
+        }
+      }
     }
   }
 

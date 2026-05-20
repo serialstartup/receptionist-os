@@ -19,8 +19,16 @@ import {
 } from "lucide-react"
 import { AdvancedCalendar } from "@/components/dashboard/advanced-calendar"
 
-import { createAppointment } from "../actions"
+import { createAppointment, updateAppointment, deleteAppointment } from "../actions"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type TimeFilter = "today" | "week" | "month"
 
@@ -70,10 +78,10 @@ export function AppointmentsClient({
         start_time: "",
         notes: "",
       })
+      toast.success("Appointment booked.")
       router.refresh()
     } catch (error) {
-      console.error("Error creating appointment:", error)
-      alert("Failed to create appointment.")
+      toast.error("Failed to create appointment.")
     } finally {
       setIsSubmitting(false)
     }
@@ -315,9 +323,47 @@ export function AppointmentsClient({
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent hover:text-foreground">
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button data-testid="appointment-menu" className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent hover:text-foreground">
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {(["confirmed", "completed", "no-show"] as const).map((s) => (
+                              <DropdownMenuItem
+                                key={s}
+                                onClick={async () => {
+                                  try {
+                                    await updateAppointment(appt.id, { status: s })
+                                    toast.success(`Marked as ${s}.`)
+                                    router.refresh()
+                                  } catch {
+                                    toast.error("Failed to update status.")
+                                  }
+                                }}
+                              >
+                                Mark {s}
+                              </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={async () => {
+                                if (!confirm("Cancel this appointment?")) return
+                                try {
+                                  await deleteAppointment(appt.id)
+                                  toast.success("Appointment cancelled.")
+                                  router.refresh()
+                                } catch {
+                                  toast.error("Failed to cancel appointment.")
+                                }
+                              }}
+                            >
+                              Cancel appointment
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   )

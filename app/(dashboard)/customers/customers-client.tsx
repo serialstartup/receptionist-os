@@ -4,9 +4,17 @@ import { useState } from "react"
 import { TopBar } from "@/components/dashboard/top-bar"
 import { EmptyState } from "@/components/ui/empty-state"
 import { cn } from "@/lib/utils"
-import { Plus, SlidersHorizontal, MoreVertical, Users, X, Loader2, Search } from "lucide-react"
-import { createCustomer } from "../actions"
+import { Plus, SlidersHorizontal, MoreVertical, Users, X, Loader2, Search, Pencil, Trash2 } from "lucide-react"
+import { createCustomer, updateCustomer, deleteCustomer } from "../actions"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type TabFilter = "all" | "new" | "returning"
 
@@ -35,6 +43,16 @@ export function CustomersClient({ customers, profile }: CustomersClientProps) {
     notes: "",
   })
 
+  const [editingCustomer, setEditingCustomer] = useState<any | null>(null)
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    age: "",
+    notes: "",
+  })
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false)
+
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const [filters, setFilters] = useState({
     minVisits: 0,
@@ -44,6 +62,47 @@ export function CustomersClient({ customers, profile }: CustomersClientProps) {
 
   const router = useRouter()
   const itemsPerPage = 10
+
+  const openEdit = (customer: any) => {
+    setEditingCustomer(customer)
+    setEditFormData({
+      name: customer.name || "",
+      phone: customer.phone || "",
+      email: customer.email || "",
+      age: customer.age?.toString() || "",
+      notes: customer.notes || "",
+    })
+  }
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingCustomer) return
+    setIsEditSubmitting(true)
+    try {
+      await updateCustomer(editingCustomer.id, {
+        ...editFormData,
+        age: editFormData.age ? parseInt(editFormData.age) : undefined,
+      })
+      setEditingCustomer(null)
+      toast.success("Customer updated.")
+      router.refresh()
+    } catch {
+      toast.error("Failed to update customer.")
+    } finally {
+      setIsEditSubmitting(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this customer? All their appointments will remain but they'll be unlinked.")) return
+    try {
+      await deleteCustomer(id)
+      toast.success("Customer deleted.")
+      router.refresh()
+    } catch {
+      toast.error("Failed to delete customer.")
+    }
+  }
 
   const resetFilters = () => {
     setFilters({
@@ -63,17 +122,11 @@ export function CustomersClient({ customers, profile }: CustomersClientProps) {
         age: formData.age ? parseInt(formData.age) : undefined,
       })
       setIsModalOpen(false)
-      setFormData({
-        name: "",
-        phone: "",
-        email: "",
-        age: "",
-        notes: "",
-      })
+      setFormData({ name: "", phone: "", email: "", age: "", notes: "" })
+      toast.success("Customer created.")
       router.refresh()
-    } catch (error) {
-      console.error("Error creating customer:", error)
-      alert("Failed to create customer.")
+    } catch {
+      toast.error("Failed to create customer.")
     } finally {
       setIsSubmitting(false)
     }
@@ -272,9 +325,27 @@ export function CustomersClient({ customers, profile }: CustomersClientProps) {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="rounded-lg p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-accent hover:text-foreground transition-all">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="rounded-lg p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-accent hover:text-foreground transition-all">
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(customer)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => handleDelete(customer.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}
@@ -449,6 +520,53 @@ export function CustomersClient({ customers, profile }: CustomersClientProps) {
           </div>
         </div>
       )}
+      {/* Edit Customer Modal */}
+      {editingCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-lg animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-foreground">Edit Customer</h3>
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="rounded-lg p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Full Name</label>
+                  <input required type="text" value={editFormData.name} onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })} className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Phone Number</label>
+                  <input required type="tel" value={editFormData.phone} onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })} className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Age (Optional)</label>
+                  <input type="number" value={editFormData.age} onChange={(e) => setEditFormData({ ...editFormData, age: e.target.value })} className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Email (Optional)</label>
+                  <input type="email" value={editFormData.email} onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })} className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Internal Notes (Optional)</label>
+                  <textarea value={editFormData.notes} onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })} className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all h-24 resize-none" />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setEditingCustomer(null)} className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition-colors">Cancel</button>
+                <button type="submit" disabled={isEditSubmitting} className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-70 transition-all flex items-center justify-center gap-2 shadow-sm">
+                  {isEditSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" />Saving...</> : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Filter Modal */}
       {isFilterModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">

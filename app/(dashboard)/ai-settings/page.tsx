@@ -6,9 +6,11 @@ export default async function AISettingsPage() {
   const { data: userData } = await supabase.auth.getUser()
   const { data: profile } = await supabase
     .from("users")
-    .select("*")
+    .select("*, businesses(*)")
     .eq("id", userData.user?.id)
     .single()
 
-  return <AISettingsClient profile={profile} />
+  const business = (profile as any)?.businesses ?? null
+
+  return <AISettingsClient profile={profile} business={business} />
 }

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Plus, Pencil, Trash2, Search, Scissors, X, Loader2 } from "lucide-react"
 import { createService, updateService, deleteService } from "../actions"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 type Category = "all" | "hair" | "nails" | "skin" | "massage"
 
@@ -59,10 +60,10 @@ export function ServicesClient({ services, profile }: ServicesClientProps) {
     if (!confirm("Are you sure you want to delete this service?")) return
     try {
       await deleteService(id)
+      toast.success("Service deleted.")
       router.refresh()
-    } catch (error) {
-      console.error("Error deleting service:", error)
-      alert("Failed to delete service.")
+    } catch {
+      toast.error("Failed to delete service.")
     }
   }
 
@@ -93,10 +94,10 @@ export function ServicesClient({ services, profile }: ServicesClientProps) {
         duration_minutes: "30",
         description: "",
       })
+      toast.success(isEditing ? "Service updated." : "Service created.")
       router.refresh()
-    } catch (error) {
-      console.error("Error saving service:", error)
-      alert("Failed to save service. Please try again.")
+    } catch {
+      toast.error("Failed to save service.")
     } finally {
       setIsSubmitting(false)
     }

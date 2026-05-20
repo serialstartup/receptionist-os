@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import { updateBusiness, updateProfile } from "../actions"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 type SettingsSection =
   | "profile"
@@ -42,10 +43,15 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
   const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
 
+  const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
   // Business state
   const [businessData, setBusinessData] = useState({
     name: business?.name || "",
-    timezone: business?.timezone || "UTC",
+    timezone: business?.timezone || "Europe/Istanbul",
+    working_hours_start: business?.working_hours_start || "09:00",
+    working_hours_end: business?.working_hours_end || "18:00",
+    working_days: (business?.working_days as number[]) || [1, 2, 3, 4, 5, 6],
   })
 
   // Profile state
@@ -58,10 +64,10 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
     setIsSaving(true)
     try {
       await updateBusiness(business.id, businessData)
+      toast.success("Business settings saved.")
       router.refresh()
-    } catch (error) {
-      console.error("Error updating business:", error)
-      alert("Failed to save business settings.")
+    } catch {
+      toast.error("Failed to save business settings.")
     } finally {
       setIsSaving(false)
     }
@@ -71,10 +77,10 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
     setIsSaving(true)
     try {
       await updateProfile(profileData)
+      toast.success("Profile saved.")
       router.refresh()
-    } catch (error) {
-      console.error("Error updating profile:", error)
-      alert("Failed to save profile settings.")
+    } catch {
+      toast.error("Failed to save profile settings.")
     } finally {
       setIsSaving(false)
     }
@@ -153,31 +159,90 @@ export function SettingsClient({ business, profile }: SettingsClientProps) {
                       <label className="mb-1 block text-xs font-medium text-foreground">
                         Timezone
                       </label>
-                      <select 
+                      <select
                         value={businessData.timezone}
                         onChange={(e) => setBusinessData({ ...businessData, timezone: e.target.value })}
                         className="mt-1 w-full cursor-pointer rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                       >
+                        <option value="Europe/Istanbul">Europe/Istanbul (UTC+3)</option>
+                        <option value="Europe/London">Europe/London (UTC+0/+1)</option>
+                        <option value="Europe/Berlin">Europe/Berlin (UTC+1/+2)</option>
+                        <option value="Europe/Paris">Europe/Paris (UTC+1/+2)</option>
+                        <option value="America/New_York">America/New_York (EST)</option>
+                        <option value="America/Chicago">America/Chicago (CST)</option>
+                        <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                        <option value="Asia/Dubai">Asia/Dubai (UTC+4)</option>
+                        <option value="Asia/Riyadh">Asia/Riyadh (UTC+3)</option>
                         <option value="UTC">UTC</option>
-                        <option value="EST">EST</option>
-                        <option value="PST">PST</option>
-                        <option value="Europe/Istanbul">Europe/Istanbul</option>
                       </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-foreground">
+                        Working Hours Start
+                      </label>
+                      <input
+                        type="time"
+                        value={businessData.working_hours_start}
+                        onChange={(e) => setBusinessData({ ...businessData, working_hours_start: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-foreground">
+                        Working Hours End
+                      </label>
+                      <input
+                        type="time"
+                        value={businessData.working_hours_end}
+                        onChange={(e) => setBusinessData({ ...businessData, working_hours_end: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="mb-2 block text-xs font-medium text-foreground">
+                        Working Days
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {DAY_LABELS.map((label, idx) => {
+                          const active = businessData.working_days.includes(idx)
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                const days = active
+                                  ? businessData.working_days.filter((d) => d !== idx)
+                                  : [...businessData.working_days, idx].sort()
+                                setBusinessData({ ...businessData, working_days: days })
+                              }}
+                              className={cn(
+                                "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
+                                active
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : "border border-border text-muted-foreground hover:bg-accent"
+                              )}
+                            >
+                              {label}
+                            </button>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-6 flex justify-end gap-3 border-t border-border pt-6">
-                  <button className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
-                    Discard
-                  </button>
                   <button
-                    onClick={() => {
-                      setBusinessData({
-                        name: business?.name || "",
-                        timezone: business?.timezone || "UTC",
-                      })
-                    }}
+                    onClick={() => setBusinessData({
+                      name: business?.name || "",
+                      timezone: business?.timezone || "Europe/Istanbul",
+                      working_hours_start: business?.working_hours_start || "09:00",
+                      working_hours_end: business?.working_hours_end || "18:00",
+                      working_days: (business?.working_days as number[]) || [1, 2, 3, 4, 5, 6],
+                    })}
                     className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                   >
                     Discard

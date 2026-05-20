@@ -201,9 +201,170 @@ export async function deleteService(id: string) {
   return { success: true }
 }
 
+export async function updateAppointment(id: string, formData: {
+  status: string
+  notes?: string
+}) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("appointments")
+    .update(formData)
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/appointments")
+  revalidatePath("/calendar")
+  return { success: true }
+}
+
+export async function deleteAppointment(id: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status: "cancelled" })
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/appointments")
+  revalidatePath("/calendar")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
+export async function updateCustomer(id: string, formData: {
+  name: string
+  phone: string
+  email?: string
+  age?: number
+  notes?: string
+}) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("customers")
+    .update(formData)
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/customers")
+  return { success: true }
+}
+
+export async function deleteCustomer(id: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/customers")
+  return { success: true }
+}
+
+export async function updateCampaign(id: string, formData: {
+  status: string
+}) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("campaigns")
+    .update(formData)
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/campaigns")
+  return { success: true }
+}
+
+export async function deleteCampaign(id: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("campaigns")
+    .delete()
+    .eq("id", id)
+    .eq("business_id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/campaigns")
+  return { success: true }
+}
+
 export async function updateBusiness(id: string, formData: {
   name: string
   timezone?: string
+  working_hours_start?: string
+  working_hours_end?: string
+  working_days?: number[]
 }) {
   const supabase = await createClient()
   const { data: userData } = await supabase.auth.getUser()
@@ -218,6 +379,128 @@ export async function updateBusiness(id: string, formData: {
   if (error) throw error
 
   revalidatePath("/settings")
+  return { success: true }
+}
+
+export async function executeCampaign(campaignId: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  // Verify campaign belongs to this business
+  const { data: campaign } = await supabase
+    .from("campaigns")
+    .select("id, name, discount_value, status")
+    .eq("id", campaignId)
+    .eq("business_id", profile.business_id)
+    .single()
+  if (!campaign) throw new Error("Campaign not found")
+
+  // Get customers with WhatsApp phones
+  const { data: customers } = await supabase
+    .from("customers")
+    .select("id, name, phone")
+    .eq("business_id", profile.business_id)
+    .not("phone", "is", null)
+
+  if (!customers || customers.length === 0) return { sent: 0 }
+
+  const message = campaign.discount_value
+    ? `Hi! ${campaign.name} — Get ${campaign.discount_value}% off your next visit. Reply to book your appointment now!`
+    : `Hi! ${campaign.name} — Reply to book your next appointment!`
+
+  const { whatsapp } = await import("@/lib/whatsapp/client")
+
+  let sent = 0
+  for (const customer of customers) {
+    if (!customer.phone) continue
+    const result = await whatsapp.sendMessage(customer.phone, message)
+    if (result) {
+      sent++
+      await supabase.from("campaign_recipients").upsert({
+        campaign_id: campaignId,
+        customer_id: customer.id,
+        sent_at: new Date().toISOString(),
+        status: "sent",
+      }, { onConflict: "campaign_id,customer_id" })
+    }
+  }
+
+  // Update sent_count
+  await supabase
+    .from("campaigns")
+    .update({ sent_count: sent, status: "ACTIVE" })
+    .eq("id", campaignId)
+
+  revalidatePath("/campaigns")
+  return { sent }
+}
+
+export async function getConversationMessages(conversationId: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data } = await supabase
+    .from("messages")
+    .select("id, role, content, created_at")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true })
+
+  return data ?? []
+}
+
+export async function toggleAITakeover(conversationId: string, aiEnabled: boolean) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from("conversations")
+    .update({ ai_enabled: aiEnabled })
+    .eq("id", conversationId)
+
+  if (error) throw error
+
+  revalidatePath("/messages")
+  return { success: true }
+}
+
+export async function updateAISettings(formData: {
+  ai_instructions: string
+  ai_tone: string
+  ai_language: string
+  ai_emoji_enabled: boolean
+  ai_enabled: boolean
+}) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("businesses")
+    .update(formData)
+    .eq("id", profile.business_id)
+
+  if (error) throw error
+
+  revalidatePath("/ai-settings")
   return { success: true }
 }
 
