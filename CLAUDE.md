@@ -1,90 +1,448 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file guides Claude Code/Codex when working inside the Receptionist OS repo.
+- Read obsidian folders in order to details:
+  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki'
+  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/current-state'
+  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/next-actions'
+
+Whenever we change something or add new features, we will update our obsidian folder in:
+   - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/decisions/[this date]'
+
+Permanent project memory lives at:
+`/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki`
+
+The wiki has its own `CLAUDE.md` for Obsidian memory rules. Do not overwrite it.
+This repo file explains the product, current state, architecture, and next work.
+
+## Project Identity
+
+Receptionist OS is an AI receptionist and operations platform for local service
+businesses.
+
+It helps businesses manage:
+- WhatsApp conversations
+- Instagram DM conversations
+- appointment requests
+- customer records
+- service catalogues
+- AI-assisted booking flows
+- campaigns and reminders
+- dashboard operations
+
+Primary target customers:
+- estetik merkezleri
+- kuaförler
+- tırnak salonları
+- dental klinikler
+- beauty salons
+- local appointment-based service businesses
+
+Core promise:
+Receptionist OS turns WhatsApp and Instagram messages into structured CRM,
+conversation, and appointment workflows. The AI receptionist answers common
+questions, checks services and availability, and helps customers book.
+
+Long-term direction:
+Receptionist OS should become a Shopify-like operating system for local service
+businesses: messaging, bookings, customers, automation, analytics, campaigns,
+and integrations in one dashboard.
+
+## Current State
+
+Dashboard and core operations are mostly implemented.
+
+Ready or near-ready modules:
+- Dashboard
+- Appointments
+- Customers
+- Services
+- Settings
+- AI Settings
+- Messages
+- Analytics
+- Campaigns
+- Calendar
+- Sentry setup
+- Supabase Auth and RLS foundation
+- Basic WhatsApp/Instagram integration code
+- OpenAI tool-calling agent foundation
+
+Active focus:
+WhatsApp live pilot.
+
+Where we stopped:
+- User reached Meta Developer Console > WhatsApp > API Setup.
+- Meta outbound test message reached the user's own phone.
+- Next milestone is inbound WhatsApp:
+  phone -> Meta test number -> app webhook -> Supabase -> AI response ->
+  WhatsApp reply.
+
+Important correction:
+Older notes may say "MVP production-ready." Interpret that as dashboard/internal
+operations being mostly ready. Meta/WhatsApp live pilot is not production-ready
+yet.
+
+## Today's MVP Goal
+
+The immediate goal is a working WhatsApp pilot.
+
+When the user sends a WhatsApp message to the Meta test number:
+1. Meta calls `/api/webhooks/whatsapp`.
+2. The webhook verifies and parses the event.
+3. The webhook routes by `phone_number_id`.
+4. Supabase creates or finds the customer.
+5. Supabase creates or finds the conversation.
+6. Supabase inserts the incoming message.
+7. Duplicate platform message IDs are ignored.
+8. The AI agent processes the conversation.
+9. The assistant reply is saved.
+10. WhatsApp receives the outbound reply.
+11. Booking requests create appointments.
+12. Dashboard shows conversation and appointment records.
+
+Acceptance:
+- WhatsApp outbound test works.
+- WhatsApp inbound webhook works.
+- Customer, conversation, and message records exist.
+- AI response is created and sent.
+- Booking creates an `appointments` row.
+- Messages and Appointments screens show the result.
+
+## Long-Term Product Goal
+
+The pilot may temporarily use one Meta test number or one manually connected
+WhatsApp Business number. That is not the final design.
+
+The final SaaS architecture must let every business connect its own WhatsApp
+Business number from the dashboard.
+
+Expected future onboarding:
+1. Business opens Integrations.
+2. Business clicks "Connect WhatsApp".
+3. Business authorizes through Meta onboarding or OAuth-style flow.
+4. System stores business-specific WhatsApp account data.
+5. Incoming webhooks route by Meta phone number IDs.
+6. Outbound messages use that business's integration credentials.
+
+`business_integrations` is the central table for this model.
+
+Do not build features that assume one global WhatsApp number forever.
+
+Meta Embedded Signup / Tech Provider onboarding comes after the first pilot
+validates the messaging and booking loop.
+
+## Tech Stack
+
+- Frontend: Next.js App Router, React, TypeScript, Tailwind CSS, shadcn-style UI,
+  lucide-react, sonner.
+- Backend: Server Components, Server Actions, Route Handlers, Supabase Auth,
+  Supabase Postgres, RLS.
+- AI: OpenAI API, tool-calling agent architecture.
+- Messaging: WhatsApp Business Cloud API, Instagram Messaging API, Meta Graph API.
+- Deployment/monitoring: Vercel, Supabase, Sentry.
 
 ## Commands
 
+Use pnpm.
+
 ```bash
-pnpm dev          # Start dev server with Turbopack
-pnpm build        # Production build
-pnpm typecheck    # Run tsc --noEmit (run before commits)
-pnpm lint         # ESLint
-pnpm format       # Prettier (auto-fix)
+pnpm dev
+pnpm build
+pnpm typecheck
+pnpm lint
+pnpm format
+pnpm test:e2e
+pnpm test:e2e:seed
 ```
 
-No test suite is configured yet.
+Known local issue:
+`pnpm typecheck` and `pnpm lint` may fail locally because Homebrew Node is linked
+against a missing `icu4c` version. Treat this as a local toolchain issue until
+Node/icu4c is fixed.
 
-## Architecture
+## Architecture Rules
 
-### Multi-Tenant SaaS Model
+`businesses` is the tenant root.
 
-The `businesses` table is the tenant root. Every data table (`services`, `customers`, `appointments`, `messages`, `conversations`, `campaigns`, `staff`) has a `business_id` FK. Each dashboard user is linked to one business via `users.business_id`. All Supabase queries must be scoped by `business_id` — this is enforced by RLS policies in the migrations.
+Every business-owned table must be scoped by `business_id`.
 
-### Supabase Clients — Which to Use Where
+Core tenant-scoped tables:
+- `users`
+- `staff`
+- `services`
+- `customers`
+- `appointments`
+- `messages`
+- `conversations`
+- `campaigns`
+- `campaign_recipients`
+- `business_integrations`
 
-| Module | Client | Why |
+Dashboard code must never trust client-provided `business_id`.
+
+Dashboard writes should:
+1. Authenticate the user.
+2. Fetch `users.business_id`.
+3. Use that `business_id` for all writes.
+4. Revalidate affected routes.
+
+Webhook and AI worker code may use admin access because Meta/OpenAI requests are
+not user-session requests.
+
+Never use admin access for normal dashboard mutations.
+
+## Supabase Client Rules
+
+Use the correct client for the context.
+
+| Context | Client | Reason |
 |---|---|---|
-| Server Components, Server Actions | `createClient()` from `lib/supabase/server.ts` | Cookie-based session, respects RLS |
-| Browser/Client Components | `createClient()` from `lib/supabase/client.ts` | Browser SSR client |
-| Webhook handlers, AI agent | `createAdminClient()` from `lib/supabase/server.ts` | Uses `SERVICE_ROLE_KEY`, bypasses RLS |
+| Server Components | `createClient()` | session-aware, respects RLS |
+| Server Actions | `createClient()` | authenticated dashboard mutations |
+| Client Components | browser client | browser session |
+| Webhooks | `createAdminClient()` | no user session, bypass RLS |
+| AI agent | `createAdminClient()` | background/platform processing |
 
-Never use `createAdminClient()` inside dashboard Server Actions — it bypasses RLS and exposes cross-tenant data.
+`createAdminClient()` uses `SUPABASE_SERVICE_ROLE_KEY`.
 
-### Auth Flow
+Do not expose service role logic to client components.
 
-`middleware.ts` → `lib/supabase/middleware.ts` runs on every request. It refreshes the Supabase session cookie and redirects unauthenticated users to `/login`. Webhook routes (`/api/webhooks/*`) are excluded from auth.
+## Messaging Pipeline
 
-Dashboard layout (`app/(dashboard)/layout.tsx`) fetches the authenticated user's profile from `users` and passes it to `DashboardLayoutWrapper`. All dashboard pages live in `app/(dashboard)/` route group.
+Target pipeline:
+1. WhatsApp or Instagram webhook receives event.
+2. Webhook verifies token/signature.
+3. Webhook extracts platform message ID and sender.
+4. Webhook routes platform ID to business.
+5. Webhook finds or creates customer.
+6. Webhook finds or creates conversation.
+7. Webhook inserts message.
+8. Duplicate platform message IDs are ignored.
+9. If AI is enabled, webhook triggers the AI agent.
+10. AI reads conversation history and business settings.
+11. AI calls deterministic tools.
+12. AI response is saved to `messages`.
+13. Platform client sends the response back.
 
-### Server Actions Pattern
+Routing IDs:
+- WhatsApp inbound uses `value.metadata.phone_number_id`.
+- Instagram inbound uses recipient/business account ID.
 
-All mutations go through `app/(dashboard)/actions.ts` (Server Actions). Each action:
-1. Calls `createClient()` to get a session-aware Supabase client
-2. Fetches `users.business_id` to scope the write operation
-3. Inserts/updates with `business_id` from the profile (never from client input)
-4. Calls `revalidatePath()` to bust the cache
+The routing record lives in `business_integrations`.
 
-### AI Receptionist Pipeline
+## WhatsApp Architecture
 
-Incoming message → webhook handler → upsert to `messages` + `conversations` → call `processConversationMessage(conversationId)` in `lib/ai/agent.ts`.
+Temporary pilot:
+- One Meta test number or manually connected WhatsApp Business number is allowed.
+- Vercel env may hold fallback credentials for local/pilot testing.
 
-`processConversationMessage` runs a stateful FSM:
-- Reads `conversations.current_state` (START → COLLECT_SERVICE → COLLECT_TIME → CONFIRMING → DONE)
-- Calls OpenAI `gpt-4o` with tool definitions from `lib/ai/tools.ts`
-- Tool calls are resolved deterministically: `getServices`, `getAvailableSlots` (via `lib/scheduling/engine.ts`), `createAppointment`
-- State transitions are written back to `conversations.current_state`
-- Response is saved to `messages` and sent back via the platform client
+Permanent SaaS model:
+- Each business has a `business_integrations` row.
+- Each WhatsApp integration stores phone number ID and token.
+- Webhooks route by `wa_phone_number_id`.
+- Outbound sends use business-specific credentials.
 
-### Messaging Platform Clients
+## Instagram Architecture
 
-- `lib/whatsapp/client.ts` — wraps Meta Graph API v21.0 for sending WhatsApp messages
-- Instagram messages are sent directly in the webhook handler via the Graph API
-- Webhook verification for both platforms uses `VERIFY_TOKEN` env vars (GET handler returns `hub.challenge`)
-- WhatsApp webhooks validate the `x-hub-signature-256` header using `META_APP_SECRET`
-- Platform → business routing: webhooks look up `business_integrations` table by `wa_phone_number_id` or `ig_user_id`
+Instagram Messaging API is a parallel platform.
 
-### Database Schema (Migrations in `supabase/migrations/`)
+For the immediate MVP, WhatsApp has priority.
 
-Key tables and their purpose:
-- `businesses` — tenant root, stores working hours, timezone
-- `users` — auth users, linked to a business via `business_id`, role: admin/staff/viewer
-- `staff` — employees (separate from auth users)
-- `services` — offered services with price and `duration_minutes`
-- `customers` — CRM records with tags and visit history
-- `appointments` — bookings with status (`scheduled|confirmed|completed|cancelled|no-show`), source (`whatsapp|instagram|dashboard`)
-- `conversations` — threaded message context per customer per platform, holds `current_state` and `ai_enabled` flag
-- `messages` — individual messages linked to a conversation, role: `user|assistant|agent`
-- `campaigns` / `campaign_recipients` — bulk messaging
-- `business_integrations` — per-business WhatsApp and Instagram credentials (tokens stored in DB — encrypt in production)
+Instagram should reuse the same conversation/message/AI abstraction once
+WhatsApp proves webhook delivery, AI response, appointment creation, and
+dashboard visibility.
 
-### Path Aliases
+## AI Receptionist Rules
 
-`@/` maps to the project root (configured in `tsconfig.json`). Use `@/lib/...`, `@/components/...`, `@/app/...`.
+The AI should not write arbitrary data directly.
 
-## Environment Variables
+It should use deterministic backend tools for business actions.
 
-See `.env.example`. Required for full local operation:
-- `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
+Key files:
+- `lib/ai/tools.ts`
+- `lib/ai/agent.ts`
+- `lib/scheduling/engine.ts`
+
+The agent should:
+- read business settings
+- read conversation history
+- keep responses concise
+- use tools for pricing and availability
+- never guess appointment availability
+- respect conversation-level `ai_enabled`
+- respect business-level `ai_enabled`
+- save assistant messages
+- send outbound messages through the correct platform client
+
+Booking must be deterministic and conflict-aware.
+
+## Scheduling Rules
+
+The scheduling engine must account for:
+- business working days
+- business working hours
+- service duration
+- staff availability
+- existing appointments
+- appointment status
+- conflicts and double-booking prevention
+
+If a requested slot is no longer available, the AI should ask the user to choose
+another time.
+
+## Database Summary
+
+Important tables:
+- `businesses`: tenant root, settings, working hours, AI settings
+- `users`: dashboard users linked to one business
+- `staff`: service providers
+- `services`: service catalog
+- `customers`: CRM records
+- `appointments`: bookings
+- `messages`: individual chat messages
+- `conversations`: threaded platform conversations
+- `business_integrations`: WhatsApp/Instagram connection data
+- `campaigns`: campaign definitions
+- `campaign_recipients`: campaign send records
+
+Migration files live in `supabase/migrations/`.
+
+Keep migrations idempotent when possible.
+
+## Known P0 Gaps
+
+Current WhatsApp pilot blockers:
+1. WhatsApp webhook saves incoming messages but must trigger
+   `processConversationMessage(conversation.id)`.
+2. WhatsApp client relies on global env credentials and must become tenant-aware.
+3. Messages page queries `conversations.updated_at`, while migration 004 creates
+   `last_message_at`.
+4. `.env.example` uses outdated WhatsApp env names.
+5. Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint`.
+6. Appointment tool logic should consistently use conflict-safe booking logic.
+
+Do not mark the WhatsApp pilot complete until these are resolved and tested.
+
+## Meta Setup Notes
+
+Never write API keys, access tokens, app secrets, verify tokens, or private phone
+numbers into this file, the wiki, commits, or chat.
+
+Use Vercel environment variables for production.
+
+Important env names:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 - `OPENAI_API_KEY`
-- `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` + `WHATSAPP_VERIFY_TOKEN` + `META_APP_SECRET`
+- `WHATSAPP_ACCESS_TOKEN`
+- `WHATSAPP_PHONE_NUMBER_ID`
+- `WHATSAPP_VERIFY_TOKEN`
+- `META_APP_SECRET`
 - `INSTAGRAM_VERIFY_TOKEN`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_SENTRY_DSN`
+- `SENTRY_DSN`
+- `SENTRY_AUTH_TOKEN`
+
+Production WhatsApp webhook path:
+`/api/webhooks/whatsapp`
+
+Full callback URL format:
+`https://<production-domain>/api/webhooks/whatsapp`
+
+Meta webhook verification uses `hub.mode`, `hub.verify_token`, and
+`hub.challenge`.
+
+WhatsApp POST signature verification uses `x-hub-signature-256` and
+`META_APP_SECRET`.
+
+## Dashboard Module Notes
+
+- Appointments: CRUD/status changes exist; AI-created appointments must appear.
+- Customers: CRM exists; webhooks should create customers automatically.
+- Messages: real conversations/messages, AI takeover/handoff; human reply may
+  need more work.
+- AI Settings: business-level prompt, tone, language, emoji settings; agent
+  should read them.
+- Services: active catalogue feeds AI service and pricing answers.
+- Settings: working hours, working days, timezone affect scheduling.
+- Campaigns: basic flow exists; advanced template compliance can come later.
+
+## Testing and Acceptance
+
+Before considering a change complete, run or document why you could not run:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
+WhatsApp pilot acceptance:
+- Meta outbound test message works.
+- Meta webhook GET verification works.
+- Meta inbound POST reaches the app.
+- Incoming message creates/fetches customer.
+- Incoming message creates/fetches conversation.
+- Incoming message inserts into `messages`.
+- Duplicate message IDs are ignored.
+- AI response is saved.
+- WhatsApp reply is sent.
+- Appointment booking creates an appointment.
+- Dashboard shows conversation and appointment.
+- Human takeover disables AI for that conversation.
+
+Dashboard acceptance:
+- authenticated users only see their business data
+- mutations scope by `business_id`
+- `revalidatePath()` updates the relevant page
+- empty states and errors are handled
+
+## Wiki Memory Rules
+
+Permanent project memory:
+`/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki`
+
+Before major work, read `index.md`, `current-state.md`, `next-actions.md`,
+`open-questions.md`, and directly relevant decision or architecture pages.
+
+After meaningful changes, update `current-state.md`, `next-actions.md`,
+`log.md`, and a decision file if a durable product/architecture decision was
+made.
+
+Wiki language is Turkish.
+
+Do not store secrets in the wiki.
+
+## Coding Rules
+
+Prefer existing patterns over new abstractions.
+
+Keep edits scoped to the requested outcome.
+
+Use Server Actions for authenticated dashboard mutations.
+
+Use Route Handlers for platform webhooks and integration callbacks.
+
+Use structured APIs over ad hoc string parsing.
+
+Keep UI consistent with the existing dashboard.
+
+Use lucide-react icons for dashboard controls when possible.
+
+Never revert unrelated user changes.
+
+Do not run destructive git commands unless explicitly asked.
+
+## Current Priority Order
+
+1. Finish WhatsApp live pilot.
+2. Fix tenant-aware WhatsApp sending.
+3. Align message/conversation schema usage.
+4. Validate AI booking loop.
+5. Deploy and test on production URL.
+6. Update wiki memory.
+7. Prepare demo/pilot customer flow.
+8. Move toward self-serve WhatsApp onboarding.
