@@ -1,2 +1,7 @@
-ignoredBuiltDependencies:
-  - '@sentry/cli'
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - lightningcss
+  - msw
+  - sharp
+  - unrs-resolver
