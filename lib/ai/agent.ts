@@ -7,9 +7,9 @@ import {
 } from "@/lib/scheduling/engine"
 import { addMinutes, parseISO, format } from "date-fns"
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+}
 
 /**
  * Process a message within a specific conversation context.
@@ -80,7 +80,7 @@ Rules:
 - Keep responses concise for ${conversation.platform}.${customInstructions}`
 
   // 4. Run AI Completion
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [
       { role: "system", content: systemPrompt },
@@ -233,7 +233,7 @@ Rules:
     }
 
     // Final LLM Pass
-    const secondPass = await openai.chat.completions.create({
+    const secondPass = await getOpenAI().chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },
