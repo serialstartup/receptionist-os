@@ -1,8 +1,3 @@
-/**
- * WhatsApp Business API Client
- * Handles sending messages via Meta's Graph API.
- */
-
 const API_VERSION = "v21.0"
 
 export interface WhatsAppMessageResponse {
@@ -11,18 +6,22 @@ export interface WhatsAppMessageResponse {
   messages: Array<{ id: string }>
 }
 
+interface WhatsAppCredentials {
+  accessToken: string
+  phoneNumberId: string
+}
+
 export const whatsapp = {
-  /**
-   * Send a text message to a WhatsApp user.
-   * @param to The recipient's phone number (with country code, e.g., '905321234567')
-   * @param text The message content
-   */
-  async sendMessage(to: string, text: string): Promise<WhatsAppMessageResponse | null> {
-    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
-    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
+  async sendMessage(
+    to: string,
+    text: string,
+    credentials?: WhatsAppCredentials
+  ): Promise<WhatsAppMessageResponse | null> {
+    const accessToken = credentials?.accessToken ?? process.env.WHATSAPP_ACCESS_TOKEN
+    const phoneNumberId = credentials?.phoneNumberId ?? process.env.WHATSAPP_PHONE_NUMBER_ID
 
     if (!accessToken || !phoneNumberId) {
-      console.error("WhatsApp credentials missing in environment variables.")
+      console.error("WhatsApp credentials missing.")
       return null
     }
 
@@ -38,7 +37,7 @@ export const whatsapp = {
         body: JSON.stringify({
           messaging_product: "whatsapp",
           recipient_type: "individual",
-          to: to,
+          to,
           type: "text",
           text: { body: text },
         }),

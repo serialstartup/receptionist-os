@@ -258,7 +258,22 @@ Rules:
     // 7. Send Outbound Message to Platform
     if (conversation.platform === "whatsapp") {
       const { whatsapp } = await import("@/lib/whatsapp/client")
-      await whatsapp.sendMessage(customer.phone, finalContent)
+      const { data: waIntegration } = await supabase
+        .from("business_integrations")
+        .select("wa_access_token, wa_phone_number_id")
+        .eq("business_id", conversation.business_id)
+        .eq("is_active", true)
+        .maybeSingle()
+
+      const waCredentials =
+        waIntegration?.wa_access_token && waIntegration?.wa_phone_number_id
+          ? {
+              accessToken: waIntegration.wa_access_token,
+              phoneNumberId: waIntegration.wa_phone_number_id,
+            }
+          : undefined
+
+      await whatsapp.sendMessage(customer.phone, finalContent, waCredentials)
     } else if (conversation.platform === "instagram") {
       const { data: integration } = await supabase
         .from("business_integrations")
