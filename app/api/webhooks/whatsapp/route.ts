@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
+import { NextResponse, after } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
+import { processConversationMessage } from "@/lib/ai/agent"
 import crypto from "crypto"
 
 // Meta Webhook Secrets
@@ -154,12 +155,14 @@ export async function POST(request: Request) {
       // THE USER REQUESTED: "Webhook -> save message -> queue job -> return 200"
       
       if (conversation.ai_enabled) {
-        // We'll use a detached execution to simulate a background job if our environment allows,
-        // but Vercel/Next.js routes need a stable way. For now, let's keep it in-process 
-        // but emphasize the structure.
-        console.log("Queuing AI response for conversation:", conversation.id)
-        
-        // This is where we'd call processIncomingMessage(conversation.id) in the background.
+        const convId = conversation.id
+        after(async () => {
+          try {
+            await processConversationMessage(convId)
+          } catch (err) {
+            console.error("AI agent error for conversation", convId, err)
+          }
+        })
       }
     }
 
