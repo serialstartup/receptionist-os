@@ -18,11 +18,11 @@ export default async function MessagesPage() {
       platform,
       current_state,
       ai_enabled,
-      updated_at,
+      last_message_at,
       customers(id, name, phone)
     `)
     .eq("business_id", profile?.business_id)
-    .order("updated_at", { ascending: false })
+    .order("last_message_at", { ascending: false })
 
   return (
     <MessagesClient
