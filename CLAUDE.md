@@ -69,37 +69,39 @@ Ready or near-ready modules:
 - OpenAI tool-calling agent (working on Vercel)
 
 Active focus:
-WhatsApp booking loop validation + dashboard Messages screen.
+Human reply action + demo preparation.
 
-WhatsApp pilot status (as of 2026-06-09): WORKING end-to-end.
+WhatsApp pilot status (as of 2026-06-11): FULLY VALIDATED end-to-end.
 - Vercel deployment live at receptionist-os.vercel.app
 - Meta webhook registered and verified
 - Inbound message → customer/conversation created → AI response → WhatsApp reply: ✅
-- Missing migrations 002/003/004/006 applied to Supabase
-- All 6 Supabase migrations now applied
+- AI booking loop: getServices → getAvailableSlots → createAppointment: ✅
+- Business-level AI toggle (AI Settings page): ✅
+- Conversation-level AI toggle (Messages "Take Over" button): ✅ code ready
+- Messages dashboard: conversations list, message view, timestamps: ✅
+- All 6 Supabase migrations applied
 
-Where we stopped (2026-06-09):
-- WhatsApp pilot pipeline fully validated
-- Next: test Messages dashboard screen shows conversations
-- Next: test booking flow (AI creates appointment via tool call)
-- Next: verify Appointments screen shows AI-created bookings
+Where we stopped (2026-06-11):
+- Human takeover flow tested via AI Settings — conversation-level takeover pending live test
+- Human reply action missing — operator cannot send WhatsApp message from dashboard
+- Emoji toggle instruction strengthened, pending production test
 
-## Today's MVP Goal
+## MVP Acceptance Status (as of 2026-06-11)
 
-WhatsApp pilot is working end-to-end as of 2026-06-09. ✅
-
-Completed acceptance criteria:
+All core WhatsApp pilot criteria are met:
 - WhatsApp outbound test works. ✅
 - WhatsApp inbound webhook works. ✅
 - Customer, conversation, and message records exist. ✅
 - AI response is created and sent. ✅
 - Duplicate message IDs are ignored. ✅
+- Booking creates an `appointments` row. ✅ (validated 2026-06-11)
+- Messages screen shows conversations and messages. ✅ (fixed 2026-06-11)
+- Appointments screen shows AI-created bookings. ✅ (upcoming filter fixed)
+- Human takeover disables AI for conversation. ✅ (code ready, live test pending)
 
-Remaining acceptance criteria:
-- Booking creates an `appointments` row. (needs booking flow test)
-- Messages screen shows conversation and messages. (needs dashboard test)
-- Appointments screen shows AI-created booking. (needs booking flow test)
-- Human takeover disables AI for that conversation. (not yet tested)
+Remaining gaps:
+- Human operator reply from dashboard (no send action yet).
+- Emoji toggle needs production test (instruction strengthened).
 
 ## Long-Term Product Goal
 
@@ -312,11 +314,19 @@ Resolved (2026-06-09):
 5. ✅ All migrations 001-006 applied to Supabase production.
 6. ✅ Vercel deployment live with all env vars.
 
+Resolved (2026-06-11):
+7. ✅ engine.ts uses `createAdminClient()` — safe inside `after()` background context.
+8. ✅ Agentic loop (multi-turn, MAX_TURNS=6) — getServices → getAvailableSlots → createAppointment in one run.
+9. ✅ Staff-free booking — calendar-level conflict check, staff_id nullable.
+10. ✅ Appointments filter fixed — upcoming/week/month look forward, not backward.
+11. ✅ Messages dashboard Invalid Date fixed — `updated_at` → `last_message_at`.
+12. ✅ Sidebar Messages link added.
+13. ✅ AI booking loop end-to-end validated on production (WhatsApp → DB appointment row).
+
 Remaining:
-- Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint`.
-- Booking loop not yet validated end-to-end (AI tool → appointment row).
-- Messages dashboard screen not yet tested with real conversations.
-- Human takeover flow not yet tested.
+- Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint` (toolchain issue, not code).
+- Human reply action missing — operator cannot send WhatsApp messages from dashboard.
+- `getAvailableSlots` throws on second agent turn (caught by try-catch, minor).
 
 ## Meta Setup Notes
 
@@ -436,9 +446,10 @@ Do not run destructive git commands unless explicitly asked.
 2. ✅ Fix tenant-aware WhatsApp sending.
 3. ✅ Align message/conversation schema usage.
 4. ✅ Deploy and test on production URL.
-5. Test Messages dashboard screen with real WhatsApp conversations.
-6. Validate AI booking loop (service → slot → appointment row).
-7. Test Appointments screen shows AI-created bookings.
-8. Test human takeover flow (conversation status → 'human').
-9. Prepare demo/pilot customer flow.
-10. Move toward self-serve WhatsApp onboarding.
+5. ✅ Test Messages dashboard screen with real WhatsApp conversations.
+6. ✅ Validate AI booking loop (service → slot → appointment row).
+7. ✅ Test Appointments screen shows AI-created bookings.
+8. Test human takeover flow live (conversation-level ai_enabled toggle). ← NEXT
+9. Implement human reply action (operator sends WhatsApp message from dashboard).
+10. Prepare demo/pilot customer flow.
+11. Move toward self-serve WhatsApp onboarding.

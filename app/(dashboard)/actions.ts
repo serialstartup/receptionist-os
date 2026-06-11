@@ -443,6 +443,27 @@ export async function executeCampaign(campaignId: string) {
   return { sent }
 }
 
+export async function getConversations() {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { data } = await supabase
+    .from("conversations")
+    .select("id, platform, current_state, ai_enabled, last_message_at, customers(id, name, phone)")
+    .eq("business_id", profile.business_id)
+    .order("last_message_at", { ascending: false })
+
+  return (data as any[]) ?? []
+}
+
 export async function getConversationMessages(conversationId: string) {
   const supabase = await createClient()
   const { data: userData } = await supabase.auth.getUser()
@@ -455,6 +476,74 @@ export async function getConversationMessages(conversationId: string) {
     .order("created_at", { ascending: true })
 
   return data ?? []
+}
+
+export async function sendHumanReply(conversationId: string, content: string) {
+  if (!content.trim()) throw new Error("Message is empty")
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  // Fetch conversation + customer phone, scoped to business
+  const { data: conversation } = await supabase
+    .from("conversations")
+    .select("id, platform, customer_id, customers(phone)")
+    .eq("id", conversationId)
+    .eq("business_id", profile.business_id)
+    .single()
+  if (!conversation) throw new Error("Conversation not found")
+
+  const customerPhone = (conversation.customers as any)?.phone
+  if (!customerPhone) throw new Error("Customer phone not found")
+
+  // Send via platform
+  if (conversation.platform === "whatsapp") {
+    const { data: integration } = await supabase
+      .from("business_integrations")
+      .select("wa_access_token, wa_phone_number_id")
+      .eq("business_id", profile.business_id)
+      .eq("platform", "whatsapp")
+      .single()
+
+    const { whatsapp } = await import("@/lib/whatsapp/client")
+    const credentials = integration?.wa_access_token && integration?.wa_phone_number_id
+      ? { accessToken: integration.wa_access_token, phoneNumberId: integration.wa_phone_number_id }
+      : undefined
+    const result = await whatsapp.sendMessage(customerPhone, content, credentials)
+    if (!result) throw new Error("Failed to send WhatsApp message")
+  }
+
+  // Save message to DB
+  const { data: message, error } = await supabase
+    .from("messages")
+    .insert({
+      business_id: profile.business_id,
+      conversation_id: conversationId,
+      customer_id: conversation.customer_id,
+      role: "assistant",
+      content: content.trim(),
+    })
+    .select("id, role, content, created_at")
+    .single()
+
+  if (error) throw error
+
+  // Update conversation last_message_at
+  await supabase
+    .from("conversations")
+    .update({ last_message_at: new Date().toISOString() })
+    .eq("id", conversationId)
+
+  revalidatePath("/messages")
+  return { success: true, message }
 }
 
 export async function toggleAITakeover(conversationId: string, aiEnabled: boolean) {

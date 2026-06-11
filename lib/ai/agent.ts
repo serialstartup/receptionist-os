@@ -59,7 +59,9 @@ export async function processConversationMessage(conversationId: string) {
     energetic: "Energetic and upbeat",
   }
   const tone = toneMap[business.ai_tone ?? "friendly"] ?? "Friendly and warm"
-  const emojiNote = business.ai_emoji_enabled === false ? "Do not use emojis." : "You may use emojis occasionally."
+  const emojiNote = business.ai_emoji_enabled === false
+    ? "NEVER use emojis. Do not include any emoji character in your responses."
+    : "You may use emojis occasionally."
   const customInstructions = business.ai_instructions
     ? `\n\nBusiness Instructions:\n${business.ai_instructions}`
     : ""
@@ -120,13 +122,17 @@ Rules:
         result = JSON.stringify(data)
         newState = "COLLECT_SERVICE"
       } else if (toolCall.function.name === "getAvailableSlots") {
-        try {
-          const slots = await getAvailableSlots(conversation.business_id, args.service_id, args.date)
-          result = JSON.stringify(slots)
-          newState = "COLLECT_TIME"
-        } catch (err) {
-          console.error("getAvailableSlots error:", err)
-          result = JSON.stringify({ error: "Could not fetch available slots. Please try again." })
+        if (!args.service_id || !args.date) {
+          result = JSON.stringify({ error: "Missing required parameters: service_id and date." })
+        } else {
+          try {
+            const slots = await getAvailableSlots(conversation.business_id, args.service_id, args.date)
+            result = JSON.stringify(slots)
+            newState = "COLLECT_TIME"
+          } catch (err) {
+            console.error("getAvailableSlots error:", err)
+            result = JSON.stringify({ error: "Could not fetch available slots. Please try again." })
+          }
         }
       } else if (toolCall.function.name === "createAppointment") {
         try {

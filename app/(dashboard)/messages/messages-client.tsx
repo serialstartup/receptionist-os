@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { getConversationMessages, toggleAITakeover } from "@/app/(dashboard)/actions"
+import { getConversationMessages, toggleAITakeover, sendHumanReply, getConversations } from "@/app/(dashboard)/actions"
 import { toast } from "sonner"
 import { TopBar } from "@/components/dashboard/top-bar"
 
@@ -40,6 +40,8 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
   const [messages, setMessages] = useState<Message[]>([])
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [togglingAI, setTogglingAI] = useState(false)
+  const [replyText, setReplyText] = useState("")
+  const [sendingReply, setSendingReply] = useState(false)
   const [localConversations, setLocalConversations] = useState(conversations)
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -66,6 +68,23 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
     }
   }
 
+  const handleSendReply = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedConversation || !replyText.trim() || sendingReply) return
+    setSendingReply(true)
+    try {
+      const result = await sendHumanReply(selectedConversation.id, replyText.trim())
+      setReplyText("")
+      if (result.message) {
+        setMessages((prev) => [...prev, result.message as Message])
+      }
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to send message.")
+    } finally {
+      setSendingReply(false)
+    }
+  }
+
   const handleToggleAI = async () => {
     if (!selectedConversation) return
     setTogglingAI(true)
@@ -81,6 +100,42 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
       setTogglingAI(false)
     }
   }
+
+  // Poll messages for selected conversation every 4 seconds
+  useEffect(() => {
+    if (!selectedId) return
+    const poll = async () => {
+      if (document.visibilityState !== "visible") return
+      try {
+        const data = await getConversationMessages(selectedId)
+        setMessages((prev) => {
+          const incoming = data as Message[]
+          const lastPrev = prev[prev.length - 1]?.id
+          const lastNew = incoming[incoming.length - 1]?.id
+          return lastPrev !== lastNew ? incoming : prev
+        })
+      } catch {
+        // silent — don't disrupt UX on poll failure
+      }
+    }
+    const interval = setInterval(poll, 4000)
+    return () => clearInterval(interval)
+  }, [selectedId])
+
+  // Poll conversations list every 10 seconds
+  useEffect(() => {
+    const poll = async () => {
+      if (document.visibilityState !== "visible") return
+      try {
+        const data = await getConversations()
+        setLocalConversations(data)
+      } catch {
+        // silent
+      }
+    }
+    const interval = setInterval(poll, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -268,13 +323,21 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
                   <div className="border-t p-3 shrink-0">
                     <form
                       className="flex items-center gap-2"
-                      onSubmit={(e) => e.preventDefault()}
+                      onSubmit={handleSendReply}
                     >
                       <Input
                         placeholder="Type a message..."
                         className="flex-1 rounded-full"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        disabled={sendingReply}
                       />
-                      <Button type="submit" size="icon" className="rounded-full shrink-0">
+                      <Button
+                        type="submit"
+                        size="icon"
+                        className="rounded-full shrink-0"
+                        disabled={sendingReply || !replyText.trim()}
+                      >
                         <Send className="h-4 w-4" />
                       </Button>
                     </form>
