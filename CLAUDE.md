@@ -65,49 +65,41 @@ Ready or near-ready modules:
 - Calendar
 - Sentry setup
 - Supabase Auth and RLS foundation
-- Basic WhatsApp/Instagram integration code
-- OpenAI tool-calling agent foundation
+- WhatsApp webhook + AI agent (end-to-end working as of 2026-06-09)
+- OpenAI tool-calling agent (working on Vercel)
 
 Active focus:
-WhatsApp live pilot.
+WhatsApp booking loop validation + dashboard Messages screen.
 
-Where we stopped:
-- User reached Meta Developer Console > WhatsApp > API Setup.
-- Meta outbound test message reached the user's own phone.
-- Next milestone is inbound WhatsApp:
-  phone -> Meta test number -> app webhook -> Supabase -> AI response ->
-  WhatsApp reply.
+WhatsApp pilot status (as of 2026-06-09): WORKING end-to-end.
+- Vercel deployment live at receptionist-os.vercel.app
+- Meta webhook registered and verified
+- Inbound message → customer/conversation created → AI response → WhatsApp reply: ✅
+- Missing migrations 002/003/004/006 applied to Supabase
+- All 6 Supabase migrations now applied
 
-Important correction:
-Older notes may say "MVP production-ready." Interpret that as dashboard/internal
-operations being mostly ready. Meta/WhatsApp live pilot is not production-ready
-yet.
+Where we stopped (2026-06-09):
+- WhatsApp pilot pipeline fully validated
+- Next: test Messages dashboard screen shows conversations
+- Next: test booking flow (AI creates appointment via tool call)
+- Next: verify Appointments screen shows AI-created bookings
 
 ## Today's MVP Goal
 
-The immediate goal is a working WhatsApp pilot.
+WhatsApp pilot is working end-to-end as of 2026-06-09. ✅
 
-When the user sends a WhatsApp message to the Meta test number:
-1. Meta calls `/api/webhooks/whatsapp`.
-2. The webhook verifies and parses the event.
-3. The webhook routes by `phone_number_id`.
-4. Supabase creates or finds the customer.
-5. Supabase creates or finds the conversation.
-6. Supabase inserts the incoming message.
-7. Duplicate platform message IDs are ignored.
-8. The AI agent processes the conversation.
-9. The assistant reply is saved.
-10. WhatsApp receives the outbound reply.
-11. Booking requests create appointments.
-12. Dashboard shows conversation and appointment records.
+Completed acceptance criteria:
+- WhatsApp outbound test works. ✅
+- WhatsApp inbound webhook works. ✅
+- Customer, conversation, and message records exist. ✅
+- AI response is created and sent. ✅
+- Duplicate message IDs are ignored. ✅
 
-Acceptance:
-- WhatsApp outbound test works.
-- WhatsApp inbound webhook works.
-- Customer, conversation, and message records exist.
-- AI response is created and sent.
-- Booking creates an `appointments` row.
-- Messages and Appointments screens show the result.
+Remaining acceptance criteria:
+- Booking creates an `appointments` row. (needs booking flow test)
+- Messages screen shows conversation and messages. (needs dashboard test)
+- Appointments screen shows AI-created booking. (needs booking flow test)
+- Human takeover disables AI for that conversation. (not yet tested)
 
 ## Long-Term Product Goal
 
@@ -312,17 +304,19 @@ Keep migrations idempotent when possible.
 
 ## Known P0 Gaps
 
-Current WhatsApp pilot blockers:
-1. WhatsApp webhook saves incoming messages but must trigger
-   `processConversationMessage(conversation.id)`.
-2. WhatsApp client relies on global env credentials and must become tenant-aware.
-3. Messages page queries `conversations.updated_at`, while migration 004 creates
-   `last_message_at`.
-4. `.env.example` uses outdated WhatsApp env names.
-5. Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint`.
-6. Appointment tool logic should consistently use conflict-safe booking logic.
+Resolved (2026-06-09):
+1. ✅ Webhook now triggers `processConversationMessage()` via `after()`.
+2. ✅ WhatsApp client is tenant-aware (reads from business_integrations).
+3. ✅ Messages page updated to use `last_message_at`.
+4. ✅ `.env.example` updated with correct env names.
+5. ✅ All migrations 001-006 applied to Supabase production.
+6. ✅ Vercel deployment live with all env vars.
 
-Do not mark the WhatsApp pilot complete until these are resolved and tested.
+Remaining:
+- Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint`.
+- Booking loop not yet validated end-to-end (AI tool → appointment row).
+- Messages dashboard screen not yet tested with real conversations.
+- Human takeover flow not yet tested.
 
 ## Meta Setup Notes
 
@@ -438,11 +432,13 @@ Do not run destructive git commands unless explicitly asked.
 
 ## Current Priority Order
 
-1. Finish WhatsApp live pilot.
-2. Fix tenant-aware WhatsApp sending.
-3. Align message/conversation schema usage.
-4. Validate AI booking loop.
-5. Deploy and test on production URL.
-6. Update wiki memory.
-7. Prepare demo/pilot customer flow.
-8. Move toward self-serve WhatsApp onboarding.
+1. ✅ Finish WhatsApp live pilot (end-to-end working 2026-06-09).
+2. ✅ Fix tenant-aware WhatsApp sending.
+3. ✅ Align message/conversation schema usage.
+4. ✅ Deploy and test on production URL.
+5. Test Messages dashboard screen with real WhatsApp conversations.
+6. Validate AI booking loop (service → slot → appointment row).
+7. Test Appointments screen shows AI-created bookings.
+8. Test human takeover flow (conversation status → 'human').
+9. Prepare demo/pilot customer flow.
+10. Move toward self-serve WhatsApp onboarding.

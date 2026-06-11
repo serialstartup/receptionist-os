@@ -128,32 +128,17 @@ Rules:
             const startTime = startDt.toISOString()
             const endTime = endDt.toISOString()
 
-            // Find a free staff member for the requested slot
-            const { data: staff } = await supabase
-              .from("staff")
+            // Calendar-level conflict check (no staff required)
+            const { data: conflicts } = await supabase
+              .from("appointments")
               .select("id")
               .eq("business_id", conversation.business_id)
-              .eq("is_active", true)
+              .neq("status", "cancelled")
+              .lt("start_time", endTime)
+              .gt("end_time", startTime)
 
-            let bookedStaffId: string | null = null
-            for (const member of (staff || [])) {
-              const { data: conflicts } = await supabase
-                .from("appointments")
-                .select("id")
-                .eq("business_id", conversation.business_id)
-                .eq("staff_id", member.id)
-                .neq("status", "cancelled")
-                .lt("start_time", endTime)
-                .gt("end_time", startTime)
-
-              if (!conflicts || conflicts.length === 0) {
-                bookedStaffId = member.id
-                break
-              }
-            }
-
-            if (!bookedStaffId) {
-              result = JSON.stringify({ success: false, message: "No available staff for that time. Please choose another slot." })
+            if (conflicts && conflicts.length > 0) {
+              result = JSON.stringify({ success: false, message: "That time slot is no longer available. Please choose another slot." })
             } else {
               const { error: insertError } = await supabase
                 .from("appointments")
@@ -161,7 +146,6 @@ Rules:
                   business_id: conversation.business_id,
                   customer_id: conversation.customer_id,
                   service_id: args.service_id,
-                  staff_id: bookedStaffId,
                   start_time: startTime,
                   end_time: endTime,
                   status: "confirmed",

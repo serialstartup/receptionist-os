@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-type TimeFilter = "today" | "week" | "month"
+type TimeFilter = "today" | "upcoming" | "week" | "month"
 
 const statusStyles = {
   scheduled: "text-warning bg-warning/10",
@@ -53,7 +53,7 @@ export function AppointmentsClient({
   services,
   profile,
 }: AppointmentClientProps) {
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today")
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("upcoming")
   const [searchQuery, setSearchQuery] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -130,14 +130,22 @@ export function AppointmentsClient({
     
     if (timeFilter === "today") {
       return apptDate.toDateString() === now.toDateString()
+    } else if (timeFilter === "upcoming") {
+      const startOfToday = new Date(now)
+      startOfToday.setHours(0, 0, 0, 0)
+      return apptDate >= startOfToday
     } else if (timeFilter === "week") {
-      const oneWeekAgo = new Date(now)
-      oneWeekAgo.setDate(now.getDate() - 7)
-      return apptDate >= oneWeekAgo && apptDate <= now
+      const startOfToday = new Date(now)
+      startOfToday.setHours(0, 0, 0, 0)
+      const oneWeekLater = new Date(startOfToday)
+      oneWeekLater.setDate(startOfToday.getDate() + 7)
+      return apptDate >= startOfToday && apptDate <= oneWeekLater
     } else if (timeFilter === "month") {
-      const oneMonthAgo = new Date(now)
-      oneMonthAgo.setMonth(now.getMonth() - 1)
-      return apptDate >= oneMonthAgo && apptDate <= now
+      const startOfToday = new Date(now)
+      startOfToday.setHours(0, 0, 0, 0)
+      const oneMonthLater = new Date(startOfToday)
+      oneMonthLater.setMonth(startOfToday.getMonth() + 1)
+      return apptDate >= startOfToday && apptDate <= oneMonthLater
     }
 
     return true
@@ -185,7 +193,7 @@ export function AppointmentsClient({
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center rounded-lg border border-border bg-card p-1">
-              {(["today", "week", "month"] as const).map((filter) => (
+              {(["today", "upcoming", "week", "month"] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setTimeFilter(filter)}
@@ -222,11 +230,17 @@ export function AppointmentsClient({
           <div className="mt-6">
             <EmptyState
               icon={CalendarDays}
-              title={searchQuery ? "No results found" : "No appointments yet"}
+              title={searchQuery ? "No results found" : "No appointments"}
               description={
                 searchQuery
                   ? `We couldn't find any appointments matching "${searchQuery}".`
-                  : "Your schedule is completely clear. Start adding your bookings to see them here."
+                  : timeFilter === "today"
+                    ? "No appointments scheduled for today."
+                    : timeFilter === "upcoming"
+                      ? "No upcoming appointments. New bookings will appear here."
+                      : timeFilter === "week"
+                        ? "No appointments in the next 7 days."
+                        : "No appointments in the next 30 days."
               }
               action={
                 !searchQuery && (

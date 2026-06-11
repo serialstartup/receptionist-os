@@ -41,7 +41,7 @@ export function checkConflict(
 
 /**
  * Gets available slots for a given service and date.
- * Fetches business hours, staff availability, and existing appointments to compute free intervals.
+ * Checks business hours and existing appointments — no staff required.
  */
 export async function getAvailableSlots(
   businessId: string,
@@ -79,24 +79,13 @@ export async function getAvailableSlots(
     throw new Error("Service not found")
   }
 
-  // 3. Fetch all staff available for this service (assuming all active staff for now)
-  const { data: staff, error: staffError } = await supabase
-    .from("staff")
-    .select("id")
-    .eq("business_id", businessId)
-    .eq("is_active", true)
-
-  if (staffError || !staff || staff.length === 0) {
-    throw new Error("No staff available")
-  }
-
-  // 4. Fetch existing appointments for the given date and business
+  // 3. Fetch existing appointments for the given date and business
   const startOfDayUtc = startOfDay(date).toISOString()
   const endOfDayUtc = startOfDay(addDays(date, 1)).toISOString()
 
   const { data: appointments, error: apptError } = await supabase
     .from("appointments")
-    .select("staff_id, start_time, end_time")
+    .select("start_time, end_time")
     .eq("business_id", businessId)
     .gte("start_time", startOfDayUtc)
     .lt("start_time", endOfDayUtc)
@@ -106,16 +95,14 @@ export async function getAvailableSlots(
     throw new Error("Error fetching appointments")
   }
 
-  // 5. Calculate available slots
-  const availableSlots: Array<{ time: string; staff_id: string }> = []
+  // 4. Calculate available slots (calendar-level conflict check, no staff)
+  const availableSlots: Array<{ time: string }> = []
   const duration = service.duration_minutes
 
   const startTime = parseTimeStr(date, business.working_hours_start)
   const endTime = parseTimeStr(date, business.working_hours_end)
 
-  // Interval step in minutes (e.g., check every 15 minutes)
   const stepMinutes = 15
-
   let currentSlot = startTime
 
   while (addMinutes(currentSlot, duration) <= endTime) {
@@ -128,21 +115,10 @@ export async function getAvailableSlots(
       continue
     }
 
-    // Find at least one staff member who is free
-    for (const member of staff) {
-      const staffAppointments = (appointments || []).filter(
-        (a) => a.staff_id === member.id
-      )
+    const hasConflict = checkConflict(slotStart, slotEnd, appointments || [])
 
-      const hasConflict = checkConflict(slotStart, slotEnd, staffAppointments)
-
-      if (!hasConflict) {
-        availableSlots.push({
-          time: format(slotStart, "HH:mm"),
-          staff_id: member.id,
-        })
-        break // One available staff is enough for this time slot
-      }
+    if (!hasConflict) {
+      availableSlots.push({ time: format(slotStart, "HH:mm") })
     }
 
     currentSlot = addMinutes(currentSlot, stepMinutes)
@@ -152,16 +128,13 @@ export async function getAvailableSlots(
 }
 
 /**
- * Creates an appointment with transaction-like safety (to handle race conditions).
- * Next.js server actions / Supabase JS doesn't support generic BEGIN/COMMIT transactions easily,
- * but Supabase Postgres can handle concurrent inserts safely or via RPC.
- * For MVP, we'll perform a pre-check and insert.
+ * Creates an appointment with a pre-check for calendar conflicts.
+ * No staff assignment — slot availability is checked at the business level.
  */
 export async function createAppointmentSafely({
   businessId,
   customerId,
   serviceId,
-  staffId,
   startTime,
   endTime,
   source,
@@ -169,19 +142,17 @@ export async function createAppointmentSafely({
   businessId: string
   customerId: string
   serviceId: string
-  staffId: string
   startTime: string // ISO string
   endTime: string // ISO string
   source: string
 }) {
   const supabase = await createClient()
 
-  // Pre-check for conflicts right before inserting
+  // Pre-check: any non-cancelled appointment overlapping this slot
   const { data: existingAppts } = await supabase
     .from("appointments")
     .select("id")
     .eq("business_id", businessId)
-    .eq("staff_id", staffId)
     .neq("status", "cancelled")
     .lt("start_time", endTime)
     .gt("end_time", startTime)
@@ -192,17 +163,15 @@ export async function createAppointmentSafely({
     )
   }
 
-  // Insert appointment
   const { data, error } = await supabase
     .from("appointments")
     .insert({
       business_id: businessId,
       customer_id: customerId,
       service_id: serviceId,
-      staff_id: staffId,
       start_time: startTime,
       end_time: endTime,
-      status: "confirmed", // AI books are typically confirmed
+      status: "confirmed",
       source,
     })
     .select()
