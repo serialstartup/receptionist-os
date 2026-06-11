@@ -17,6 +17,7 @@ import {
   HelpCircle,
   PanelLeftClose,
   PanelLeftOpen,
+  MessageSquare,
 } from "lucide-react"
 
 const navigation = [
@@ -25,9 +26,9 @@ const navigation = [
   { name: "Appointments", href: "/appointments", icon: ClipboardListIcon },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Services", href: "/services", icon: Scissors },
+  { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Campaigns", href: "/campaigns", icon: Megaphone },
   { name: "Integrations", href: "/integrations", icon: Sparkles },
-  // { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "AI Settings", href: "/ai-settings", icon: Bot },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Help Center", href: "/help", icon: HelpCircle },

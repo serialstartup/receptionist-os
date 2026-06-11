@@ -18,7 +18,7 @@ interface Conversation {
   platform: string
   current_state: string
   ai_enabled: boolean
-  updated_at: string
+  last_message_at: string
   customers: { id: string; name: string; phone: string } | null
 }
 
@@ -151,7 +151,7 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
                             {conv.customers?.name ?? "Unknown"}
                           </span>
                           <span className="text-[10px] text-muted-foreground shrink-0">
-                            {formatTime(conv.updated_at)}
+                            {formatTime(conv.last_message_at)}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground truncate">
