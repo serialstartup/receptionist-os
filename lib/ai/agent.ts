@@ -109,9 +109,14 @@ Rules:
         result = JSON.stringify(data)
         newState = "COLLECT_SERVICE"
       } else if (toolCall.function.name === "getAvailableSlots") {
-        const slots = await getAvailableSlots(conversation.business_id, args.service_id, args.date)
-        result = JSON.stringify(slots)
-        newState = "COLLECT_TIME"
+        try {
+          const slots = await getAvailableSlots(conversation.business_id, args.service_id, args.date)
+          result = JSON.stringify(slots)
+          newState = "COLLECT_TIME"
+        } catch (err) {
+          console.error("getAvailableSlots error:", err)
+          result = JSON.stringify({ error: "Could not fetch available slots. Please try again." })
+        }
       } else if (toolCall.function.name === "createAppointment") {
         try {
           const { data: service } = await supabase

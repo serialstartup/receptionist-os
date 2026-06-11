@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/server"
 import {
   addMinutes,
   isBefore,
@@ -48,7 +48,7 @@ export async function getAvailableSlots(
   serviceId: string,
   dateStr: string
 ) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const date = parseISO(dateStr)
   const dayOfWeek = date.getDay() // 0 = Sunday, ..., 6 = Saturday
 
@@ -146,7 +146,7 @@ export async function createAppointmentSafely({
   endTime: string // ISO string
   source: string
 }) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   // Pre-check: any non-cancelled appointment overlapping this slot
   const { data: existingAppts } = await supabase
