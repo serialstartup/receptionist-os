@@ -1,10 +1,7 @@
 import OpenAI from "openai"
 import { tools } from "./tools"
 import { createAdminClient } from "@/lib/supabase/server"
-import {
-  getAvailableSlots,
-  createAppointmentSafely,
-} from "@/lib/scheduling/engine"
+import { getAvailableSlots } from "@/lib/scheduling/engine"
 import { addMinutes, parseISO, format } from "date-fns"
 
 function getOpenAI() {
@@ -13,12 +10,13 @@ function getOpenAI() {
 
 /**
  * Process a message within a specific conversation context.
- * This is the core worker for AI receptionist responses.
+ * Uses a multi-turn agentic loop so tool chains like
+ * getServices → getAvailableSlots → createAppointment complete in one agent run.
  */
 export async function processConversationMessage(conversationId: string) {
   const supabase = createAdminClient()
 
-  // 1. Fetch Conversation Context (with limited history)
+  // 1. Fetch conversation context
   const { data: conversation } = await supabase
     .from("conversations")
     .select(`
@@ -40,10 +38,10 @@ export async function processConversationMessage(conversationId: string) {
   const business = conversation.businesses as any
   const customer = conversation.customers as any
 
-  // Respect per-conversation ai_enabled and global business ai_enabled
+  // Respect per-conversation and global ai_enabled flags
   if (!conversation.ai_enabled || business?.ai_enabled === false) return null
 
-  // 2. Fetch last 10 messages for context (Context Builder)
+  // 2. Fetch last 10 messages for context
   const { data: historyData } = await supabase
     .from("messages")
     .select("role, content")
@@ -52,12 +50,8 @@ export async function processConversationMessage(conversationId: string) {
     .limit(10)
 
   const history = historyData ? historyData.reverse() : []
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = history.map((m) => ({
-    role: m.role as "user" | "assistant",
-    content: m.content || "",
-  }))
 
-  // 3. Construct System Prompt (dynamic instructions from DB)
+  // 3. Build system prompt
   const toneMap: Record<string, string> = {
     friendly: "Friendly and warm",
     professional: "Professional and polite",
@@ -77,27 +71,40 @@ Rules:
 - Today's date is: ${format(new Date(), "yyyy-MM-dd")}.
 - Business hours: ${business.working_hours_start} to ${business.working_hours_end}.
 - USE TOOLS for service pricing and available slots. NEVER guess availability.
+- When a customer requests a specific service and time: call getServices to get the service ID, then getAvailableSlots to verify, then createAppointment to confirm — complete the full booking in one flow without asking the user to wait.
 - Keep responses concise for ${conversation.platform}.${customInstructions}`
 
-  // 4. Run AI Completion
-  const response = await getOpenAI().chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: systemPrompt },
-      ...messages
-    ],
-    tools: tools,
-    tool_choice: "auto",
-  })
+  // 4. Agentic loop — supports multi-step tool chains
+  const agentMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: "system", content: systemPrompt },
+    ...history.map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content || "",
+    })),
+  ]
 
-  const responseMessage = response.choices[0].message
-  let finalContent = responseMessage.content
+  let finalContent: string | null = null
+  let newState = conversation.current_state
+  const MAX_TURNS = 6
 
-  // 5. Handle Tool Calls (Deterministic Actions)
-  if (responseMessage.tool_calls) {
-    const toolCallResults = []
-    let newState = conversation.current_state
+  for (let turn = 0; turn < MAX_TURNS; turn++) {
+    const response = await getOpenAI().chat.completions.create({
+      model: "gpt-4o",
+      messages: agentMessages,
+      tools,
+      tool_choice: "auto",
+    })
 
+    const responseMessage = response.choices[0].message
+    agentMessages.push(responseMessage)
+
+    // No tool calls → final answer, exit loop
+    if (!responseMessage.tool_calls || responseMessage.tool_calls.length === 0) {
+      finalContent = responseMessage.content
+      break
+    }
+
+    // Process each tool call in this turn
     for (const toolCall of responseMessage.tool_calls) {
       if (!toolCall || toolCall.type !== "function" || !toolCall.function) continue
 
@@ -105,7 +112,11 @@ Rules:
       let result = ""
 
       if (toolCall.function.name === "getServices") {
-        const { data } = await supabase.from("services").select("id, name, price, duration_minutes").eq("business_id", conversation.business_id).eq("is_active", true)
+        const { data } = await supabase
+          .from("services")
+          .select("id, name, price, duration_minutes")
+          .eq("business_id", conversation.business_id)
+          .eq("is_active", true)
         result = JSON.stringify(data)
         newState = "COLLECT_SERVICE"
       } else if (toolCall.function.name === "getAvailableSlots") {
@@ -208,33 +219,23 @@ Rules:
         }
       }
 
-      toolCallResults.push({
-        tool_call_id: toolCall.id,
+      agentMessages.push({
         role: "tool",
-        name: toolCall.function.name,
+        tool_call_id: toolCall.id,
         content: result,
       })
     }
-
-    // Update state in DB
-    if (newState !== conversation.current_state) {
-      await supabase.from("conversations").update({ current_state: newState }).eq("id", conversationId)
-    }
-
-    // Final LLM Pass
-    const secondPass = await getOpenAI().chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...messages,
-        responseMessage,
-        ...(toolCallResults as any)
-      ],
-    })
-    finalContent = secondPass.choices[0].message.content
   }
 
-  // 6. Save AI Response
+  // 5. Update conversation state if changed
+  if (newState !== conversation.current_state) {
+    await supabase
+      .from("conversations")
+      .update({ current_state: newState })
+      .eq("id", conversationId)
+  }
+
+  // 6. Save and send final response
   if (finalContent) {
     await supabase.from("messages").insert({
       business_id: conversation.business_id,
@@ -244,7 +245,6 @@ Rules:
       content: finalContent,
     })
 
-    // 7. Send Outbound Message to Platform
     if (conversation.platform === "whatsapp") {
       const { whatsapp } = await import("@/lib/whatsapp/client")
       const { data: waIntegration } = await supabase
