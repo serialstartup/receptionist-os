@@ -85,6 +85,9 @@ WhatsApp pilot status (as of 2026-06-12): LIVE TESTS COMPLETE ✅
 - Dashboard weekly chart: real data from DB: ✅
 - Notifications: real DB queries (unread convs + new appts): ✅
 - Integrations toggles: wired to toggleBusinessAI() action: ✅
+- AI agent context: working_days, phone, website injected into system prompt: ✅
+- AI Settings Business Context panel: shows what AI knows, links to Settings: ✅
+- Help Center contact form: wired to Resend email (ContactForm + /api/contact): ✅
 - All 6 Supabase migrations applied
 
 ## MVP Acceptance Status (as of 2026-06-12)
@@ -345,6 +348,18 @@ Resolved (2026-06-12):
 26. ✅ clearUnreadCount() action — resets unread when conversation opened.
 27. ✅ Messages loading.tsx skeleton added.
 
+Resolved (2026-06-12 second batch):
+28. ✅ AI agent injects working_days, phone, website into system prompt.
+29. ✅ AI Settings Business Context panel (read-only, links to Settings).
+30. ✅ Help Center ContactForm — client component + /api/contact Resend endpoint.
+31. ✅ Integration architecture: Integrations page is MVP approach; onboarding wizard = V2.
+32. ✅ Resend package added (v6.12.4). RESEND_API_KEY + RESEND_TO_EMAIL needed in Vercel.
+
+Remaining:
+- Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint` (toolchain issue, not code).
+- RESEND_API_KEY and RESEND_TO_EMAIL must be added to Vercel env before contact form works.
+- Stripe subscription (next session — full day implementation).
+
 ## Meta Setup Notes
 
 Never write API keys, access tokens, app secrets, verify tokens, or private phone
@@ -366,6 +381,8 @@ Important env names:
 - `NEXT_PUBLIC_SENTRY_DSN`
 - `SENTRY_DSN`
 - `SENTRY_AUTH_TOKEN`
+- `RESEND_API_KEY`
+- `RESEND_TO_EMAIL`
 
 Production WhatsApp webhook path:
 `/api/webhooks/whatsapp`
@@ -468,8 +485,12 @@ Do not run destructive git commands unless explicitly asked.
 7. ✅ Test Appointments screen shows AI-created bookings.
 8. ✅ sendHumanReply action implemented and live tested.
 9. ✅ Live test: human takeover + human reply + polling + emoji toggle (2026-06-12).
-10. Prepare demo/pilot customer flow. ← NEXT
-11. Move toward self-serve WhatsApp onboarding.
+10. ✅ AI context improvements + Business Context panel + Help Center email (2026-06-12).
+11. Add RESEND_API_KEY + RESEND_TO_EMAIL to Vercel, then test contact form. ← NEXT
+12. Fill AI Settings, Services, Working Hours (manual data entry).
+13. Prepare demo/pilot customer flow.
+14. Stripe subscription integration (next dedicated session).
+15. Move toward self-serve WhatsApp onboarding.
 
 
 # NOTE: Whenever we change facebook access token, we need to start this command: 
