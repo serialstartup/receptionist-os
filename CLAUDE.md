@@ -462,3 +462,7 @@ Do not run destructive git commands unless explicitly asked.
 9. Live test: human takeover + human reply + emoji toggle (after deploy). ← NEXT
 10. Prepare demo/pilot customer flow.
 11. Move toward self-serve WhatsApp onboarding.
+
+
+# NOTE: Whenever we change facebook access token, we need to start this command: 
+  - pnpm tsx scripts/update-wa-token.ts  
