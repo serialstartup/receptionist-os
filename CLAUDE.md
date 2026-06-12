@@ -69,26 +69,28 @@ Ready or near-ready modules:
 - OpenAI tool-calling agent (working on Vercel)
 
 Active focus:
-Human reply action + demo preparation.
+Live testing of human reply + takeover + emoji toggle. Then demo preparation.
 
-WhatsApp pilot status (as of 2026-06-11): FULLY VALIDATED end-to-end.
+WhatsApp pilot status (as of 2026-06-11): CODE COMPLETE — live tests pending.
 - Vercel deployment live at receptionist-os.vercel.app
 - Meta webhook registered and verified
 - Inbound message → customer/conversation created → AI response → WhatsApp reply: ✅
 - AI booking loop: getServices → getAvailableSlots → createAppointment: ✅
 - Business-level AI toggle (AI Settings page): ✅
 - Conversation-level AI toggle (Messages "Take Over" button): ✅ code ready
+- Human reply from dashboard (sendHumanReply action): ✅ code ready
+- Real-time polling: messages every 4s, conversations every 10s: ✅
+- getAvailableSlots arg guard (no crash on missing args): ✅
 - Messages dashboard: conversations list, message view, timestamps: ✅
 - All 6 Supabase migrations applied
 
-Where we stopped (2026-06-11):
-- Human takeover flow tested via AI Settings — conversation-level takeover pending live test
-- Human reply action missing — operator cannot send WhatsApp message from dashboard
-- Emoji toggle instruction strengthened, pending production test
+Where we stopped (2026-06-11 evening):
+- All code committed (187390e), push to Vercel pending
+- Human takeover, human reply, emoji toggle — live tests not yet done
 
 ## MVP Acceptance Status (as of 2026-06-11)
 
-All core WhatsApp pilot criteria are met:
+All core WhatsApp pilot criteria are met (code level):
 - WhatsApp outbound test works. ✅
 - WhatsApp inbound webhook works. ✅
 - Customer, conversation, and message records exist. ✅
@@ -98,10 +100,12 @@ All core WhatsApp pilot criteria are met:
 - Messages screen shows conversations and messages. ✅ (fixed 2026-06-11)
 - Appointments screen shows AI-created bookings. ✅ (upcoming filter fixed)
 - Human takeover disables AI for conversation. ✅ (code ready, live test pending)
+- Human operator reply from dashboard. ✅ (code ready, live test pending)
 
-Remaining gaps:
-- Human operator reply from dashboard (no send action yet).
-- Emoji toggle needs production test (instruction strengthened).
+Remaining gaps (live tests only — no more code needed):
+- Human takeover: live test pending.
+- Human reply: live test pending.
+- Emoji toggle: live test pending.
 
 ## Long-Term Product Goal
 
@@ -325,8 +329,13 @@ Resolved (2026-06-11):
 
 Remaining:
 - Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint` (toolchain issue, not code).
-- Human reply action missing — operator cannot send WhatsApp messages from dashboard.
-- `getAvailableSlots` throws on second agent turn (caught by try-catch, minor).
+- Human takeover, human reply, emoji toggle — live tests pending (code is done).
+
+Resolved (2026-06-11 evening):
+14. ✅ sendHumanReply action — dashboard → WhatsApp send + DB save.
+15. ✅ Messages form wired — state, loading, toast.
+16. ✅ Real-time polling — messages 4s, conversations 10s, visibility-aware.
+17. ✅ getAvailableSlots arg guard — no engine crash on missing args.
 
 ## Meta Setup Notes
 
@@ -449,7 +458,7 @@ Do not run destructive git commands unless explicitly asked.
 5. ✅ Test Messages dashboard screen with real WhatsApp conversations.
 6. ✅ Validate AI booking loop (service → slot → appointment row).
 7. ✅ Test Appointments screen shows AI-created bookings.
-8. Test human takeover flow live (conversation-level ai_enabled toggle). ← NEXT
-9. Implement human reply action (operator sends WhatsApp message from dashboard).
+8. ✅ sendHumanReply action implemented. Live test pending.
+9. Live test: human takeover + human reply + emoji toggle (after deploy). ← NEXT
 10. Prepare demo/pilot customer flow.
 11. Move toward self-serve WhatsApp onboarding.
