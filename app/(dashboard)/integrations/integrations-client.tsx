@@ -12,6 +12,7 @@ import {
   Link as LinkIcon,
   Bot,
 } from "lucide-react"
+import { toast } from "sonner"
 
 interface Integration {
   platform: string
@@ -37,11 +38,28 @@ export function IntegrationsClient({ profile, integrations, businessId }: Integr
   const [igState, setIgState] = useState<"disconnected" | "connected">(
     igIntegration?.is_active && igIntegration?.verified_at ? "connected" : "disconnected"
   )
+  const [aiEnabled, setAiEnabled] = useState<boolean>(profile?.ai_enabled ?? true)
+  const [togglingAI, setTogglingAI] = useState(false)
 
   const [phoneNumber, setPhoneNumber] = useState(waIntegration?.wa_phone_number || "")
   const [verificationCode, setVerificationCode] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleToggleAI = async () => {
+    setTogglingAI(true)
+    const next = !aiEnabled
+    try {
+      const { toggleBusinessAI } = await import("@/app/(dashboard)/actions")
+      await toggleBusinessAI(next)
+      setAiEnabled(next)
+      toast.success(next ? "AI receptionist enabled." : "AI receptionist paused.")
+    } catch {
+      toast.error("Failed to update AI setting.")
+    } finally {
+      setTogglingAI(false)
+    }
+  }
 
   const handleConnectWhatsApp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -233,9 +251,19 @@ export function IntegrationsClient({ profile, integrations, businessId }: Integr
                       <p className="text-sm font-medium">Automatic Responses</p>
                       <p className="text-xs text-muted-foreground">AI will handle all incoming inquiries</p>
                     </div>
-                    <div className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-primary transition-colors">
-                      <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-lg ring-0 transition-transform" />
-                    </div>
+                    <button
+                      onClick={handleToggleAI}
+                      disabled={togglingAI}
+                      className={cn(
+                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50",
+                        aiEnabled ? "bg-primary" : "bg-muted"
+                      )}
+                    >
+                      <span className={cn(
+                        "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-lg ring-0 transition-transform",
+                        aiEnabled ? "translate-x-5" : "translate-x-0.5"
+                      )} />
+                    </button>
                   </div>
                 </div>
               )}
@@ -294,9 +322,19 @@ export function IntegrationsClient({ profile, integrations, businessId }: Integr
                       <p className="text-sm font-medium">DM & Story Replies</p>
                       <p className="text-xs text-muted-foreground">Automated replies to direct messages</p>
                     </div>
-                    <div className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-primary transition-colors">
-                      <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-lg ring-0 transition-transform" />
-                    </div>
+                    <button
+                      onClick={handleToggleAI}
+                      disabled={togglingAI}
+                      className={cn(
+                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50",
+                        aiEnabled ? "bg-primary" : "bg-muted"
+                      )}
+                    >
+                      <span className={cn(
+                        "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-lg ring-0 transition-transform",
+                        aiEnabled ? "translate-x-5" : "translate-x-0.5"
+                      )} />
+                    </button>
                   </div>
                 </div>
               )}

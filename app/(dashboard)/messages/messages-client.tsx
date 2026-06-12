@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { getConversationMessages, toggleAITakeover, sendHumanReply, getConversations } from "@/app/(dashboard)/actions"
+import { getConversationMessages, toggleAITakeover, sendHumanReply, getConversations, clearUnreadCount } from "@/app/(dashboard)/actions"
 import { toast } from "sonner"
 import { TopBar } from "@/components/dashboard/top-bar"
 
@@ -18,6 +18,7 @@ interface Conversation {
   current_state: string
   ai_enabled: boolean
   last_message_at: string
+  unread_count: number
   customers: { id: string; name: string; phone: string } | null
   messages: { content: string; role: string; created_at: string }[] | null
 }
@@ -60,6 +61,11 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
     try {
       const data = await getConversationMessages(id)
       setMessages(data as Message[])
+      // Clear unread badge locally + persist to DB
+      setLocalConversations((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, unread_count: 0 } : c))
+      )
+      clearUnreadCount(id).catch(() => {})
     } catch {
       setMessages([])
       toast.error("Failed to load messages.")
@@ -203,14 +209,21 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
                     </div>
                     <div className="flex flex-1 flex-col gap-0.5 min-w-0">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-sm font-semibold truncate">
+                        <span className={cn("text-sm truncate", conv.unread_count > 0 ? "font-bold" : "font-semibold")}>
                           {conv.customers?.name ?? "Unknown"}
                         </span>
-                        <span className="text-[10px] text-muted-foreground shrink-0">
-                          {formatTime(conv.last_message_at)}
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[10px] text-muted-foreground">
+                            {formatTime(conv.last_message_at)}
+                          </span>
+                          {conv.unread_count > 0 && (
+                            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                              {conv.unread_count}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className={cn("text-xs truncate", conv.unread_count > 0 ? "text-foreground" : "text-muted-foreground")}>
                         {conv.messages?.[0]?.content ?? conv.customers?.phone ?? "—"}
                       </p>
                       <Badge

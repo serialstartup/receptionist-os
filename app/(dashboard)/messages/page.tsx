@@ -19,6 +19,7 @@ export default async function MessagesPage() {
       current_state,
       ai_enabled,
       last_message_at,
+      unread_count,
       customers(id, name, phone),
       messages(content, role, created_at)
     `)

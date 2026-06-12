@@ -9,6 +9,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from "lucide-react"
+import { ContactForm } from "./contact-form"
 
 const faqs = [
   {
@@ -136,35 +137,7 @@ export default async function HelpCenterPage() {
                 help you get the most out of BeautyAI.
               </p>
 
-              <form className="space-y-5">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">
-                    Subject
-                  </label>
-                  <select className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
-                    <option>Technical Issue</option>
-                    <option>Billing Question</option>
-                    <option>Feature Request</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">
-                    Message
-                  </label>
-                  <textarea
-                    rows={5}
-                    placeholder="Describe your issue in detail..."
-                    className="w-full resize-y rounded-lg border border-border bg-background p-4 text-sm placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="w-full rounded-lg bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-                >
-                  Send Message
-                </button>
-              </form>
+              <ContactForm />
             </div>
 
             <div className="rounded-xl border border-border bg-card p-6">

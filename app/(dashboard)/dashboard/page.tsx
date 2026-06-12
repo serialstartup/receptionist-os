@@ -16,17 +16,21 @@ import {
 export default async function DashboardPage() {
   const supabase = await createClient()
 
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
   // Execute queries in parallel using Promise.all
   const [
     { data: appointments },
     { data: customers },
     { data: userData },
     { data: allAppts },
+    { data: weekAppts },
   ] = await Promise.all([
     supabase.from("appointments").select("id, start_time, status, service_id, services(name), customers(name)").order("start_time", { ascending: true }),
     supabase.from("customers").select("id, name, created_at, phone").order("created_at", { ascending: false }).limit(5),
     supabase.auth.getUser(),
     supabase.from("appointments").select("services(price)"),
+    supabase.from("appointments").select("start_time, status").gte("start_time", sevenDaysAgo),
   ])
 
   const { data: profile } = await supabase
@@ -54,17 +58,24 @@ export default async function DashboardPage() {
 
   const upcomingAppts = appts.filter(a => new Date(a.start_time) > today)
 
-  // Example Weekly Data (In a real app, aggregate appts by day, for now pass a placeholder or aggregated real if possible)
-  // For MVP, if there are no appts, we return null or empty. But we can show a placeholder if empty to look good.
-  const weeklyData = [
-    { day: "Mon", confirmed: 4, suggested: 2 },
-    { day: "Tue", confirmed: 6, suggested: 3 },
-    { day: "Wed", confirmed: 5, suggested: 4 },
-    { day: "Thu", confirmed: 8, suggested: 5 },
-    { day: "Fri", confirmed: 12, suggested: 7 },
-    { day: "Sat", confirmed: 15, suggested: 9 },
-    { day: "Sun", confirmed: 10, suggested: 6 },
-  ]
+  const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  const weeklyMap: Record<string, { confirmed: number; suggested: number }> = {}
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    weeklyMap[dayLabels[d.getDay()]] = { confirmed: 0, suggested: 0 }
+  }
+  for (const appt of weekAppts ?? []) {
+    const label = dayLabels[new Date(appt.start_time).getDay()]
+    if (weeklyMap[label]) {
+      if (appt.status === "confirmed" || appt.status === "completed") {
+        weeklyMap[label].confirmed++
+      } else {
+        weeklyMap[label].suggested++
+      }
+    }
+  }
+  const weeklyData = Object.entries(weeklyMap).map(([day, v]) => ({ day, ...v }))
 
   return (
     <div>

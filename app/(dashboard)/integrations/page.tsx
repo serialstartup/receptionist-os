@@ -24,12 +24,20 @@ export default async function IntegrationsPage() {
 
     // Fetch existing integrations for this business
     if (businessId) {
-      const { data: intData } = await supabase
-        .from("business_integrations")
-        .select("platform, wa_phone_number, ig_username, is_active, verified_at")
-        .eq("business_id", businessId)
+      const [{ data: intData }, { data: biz }] = await Promise.all([
+        supabase
+          .from("business_integrations")
+          .select("platform, wa_phone_number, ig_username, is_active, verified_at")
+          .eq("business_id", businessId),
+        supabase
+          .from("businesses")
+          .select("ai_enabled")
+          .eq("id", businessId)
+          .single(),
+      ])
 
       integrations = intData || []
+      if (biz) profile = { ...profile, ai_enabled: biz.ai_enabled }
     }
   }
 

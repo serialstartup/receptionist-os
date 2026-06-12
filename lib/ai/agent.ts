@@ -32,7 +32,7 @@ export async function processConversationMessage(conversationId: string) {
       current_state,
       ai_enabled,
       customers(name, phone, instagram_id),
-      businesses(name, location, timezone, working_hours_start, working_hours_end, ai_instructions, ai_tone, ai_language, ai_emoji_enabled, ai_enabled)
+      businesses(name, location, phone, website, timezone, working_hours_start, working_hours_end, working_days, ai_instructions, ai_tone, ai_language, ai_emoji_enabled, ai_enabled)
     `)
     .eq("id", conversationId)
     .single()
@@ -78,6 +78,11 @@ export async function processConversationMessage(conversationId: string) {
     "Rules:",
     `- Today's date is: ${format(new Date(), "yyyy-MM-dd")}.`,
     `- Business hours: ${business.working_hours_start} to ${business.working_hours_end}.`,
+    business.working_days && business.working_days.length > 0
+      ? `- Open days: ${(business.working_days as number[]).sort((a, b) => a - b).map((d) => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d]).join(", ")}.`
+      : null,
+    business.phone ? `- Business phone: ${business.phone}.` : null,
+    business.website ? `- Website: ${business.website}.` : null,
     "- USE TOOLS for service pricing and available slots. NEVER guess availability.",
     "- When a customer requests a specific service and time: call getServices to get the service ID, then getAvailableSlots to verify, then createAppointment to confirm — complete the full booking in one flow without asking the user to wait.",
     `- Keep responses concise for ${conversation.platform}.`,

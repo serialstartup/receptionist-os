@@ -614,6 +614,48 @@ export async function updateProfile(formData: {
   return { success: true }
 }
 
+export async function toggleBusinessAI(enabled: boolean) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) throw new Error("Unauthorized")
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) throw new Error("Business not found")
+
+  const { error } = await supabase
+    .from("businesses")
+    .update({ ai_enabled: enabled })
+    .eq("id", profile.business_id)
+
+  if (error) throw error
+  revalidatePath("/ai-settings")
+  revalidatePath("/integrations")
+  return { success: true }
+}
+
+export async function clearUnreadCount(conversationId: string) {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) return
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) return
+
+  await supabase
+    .from("conversations")
+    .update({ unread_count: 0 })
+    .eq("id", conversationId)
+    .eq("business_id", profile.business_id)
+}
+
 export async function getNotifications() {
   const supabase = await createClient()
   const { data: userData } = await supabase.auth.getUser()

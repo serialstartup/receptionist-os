@@ -3,12 +3,20 @@
 import { TopBar } from "@/components/dashboard/top-bar"
 import { cn } from "@/lib/utils"
 import { Bot, Clock, MessageCircle, Save } from "lucide-react"
+import Link from "next/link"
 import { useState } from "react"
 import { updateAISettings } from "@/app/(dashboard)/actions"
 
 type SettingsTab = "personality" | "scheduling"
 
 interface Business {
+  name?: string | null
+  location?: string | null
+  phone?: string | null
+  website?: string | null
+  working_hours_start?: string | null
+  working_hours_end?: string | null
+  working_days?: number[] | null
   ai_instructions: string | null
   ai_tone: string | null
   ai_language: string | null
@@ -133,6 +141,55 @@ export function AISettingsClient({ profile, business }: AISettingsClientProps) {
 
         {/* Content */}
         {activeTab === "personality" ? (
+          <div className="space-y-6">
+            {/* Business Context — what the AI currently knows */}
+            <div className="rounded-xl border border-border bg-muted/30 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Business Context</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    What the AI currently knows about your business.{" "}
+                    <Link href="/settings" className="text-primary underline hover:no-underline">
+                      Edit in Settings →
+                    </Link>
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs sm:grid-cols-3">
+                {[
+                  { label: "Name", value: business?.name },
+                  { label: "Location", value: business?.location },
+                  { label: "Phone", value: business?.phone },
+                  { label: "Website", value: business?.website },
+                  {
+                    label: "Hours",
+                    value:
+                      business?.working_hours_start && business?.working_hours_end
+                        ? `${business.working_hours_start} – ${business.working_hours_end}`
+                        : null,
+                  },
+                  {
+                    label: "Open days",
+                    value:
+                      business?.working_days && business.working_days.length > 0
+                        ? business.working_days
+                            .slice()
+                            .sort((a, b) => a - b)
+                            .map((d) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d])
+                            .join(", ")
+                        : null,
+                  },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex flex-col gap-0.5 py-1">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className={value ? "font-medium text-foreground" : "italic text-muted-foreground/50"}>
+                      {value || "Not set"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* AI Instructions */}
             <div className="rounded-xl border border-border bg-card p-6 flex flex-col h-full">
@@ -212,6 +269,7 @@ export function AISettingsClient({ profile, business }: AISettingsClientProps) {
                 </button>
               </div>
             </div>
+          </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
