@@ -4,10 +4,10 @@ import { useState, useEffect } from "react"
 import { Sidebar } from "./sidebar"
 import { cn } from "@/lib/utils"
 
-export function DashboardLayoutWrapper({ 
+export function DashboardLayoutWrapper({
   children,
-  profile 
-}: { 
+  profile,
+}: {
   children: React.ReactNode
   profile: any
 }) {

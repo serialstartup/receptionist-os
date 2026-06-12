@@ -17,12 +17,12 @@ import {
   Scissors,
   Settings,
   LogOut,
-  User as UserIcon,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { getNotifications } from "@/app/(dashboard)/actions"
 
 interface TopBarProps {
   title: string
@@ -54,14 +54,12 @@ export function TopBar({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<{ id: string; title: string; description: string; time: string; type: string }[]>([])
   const pathname = usePathname()
 
-  // Mock notifications for appointments
-  const notifications = [
-    { id: 1, title: "New Booking", description: "Alice Smith - Hair Coloring", time: "5m ago", type: "new" },
-    { id: 2, title: "Booking Confirmed", description: "Bob Johnson - Manicure", time: "1h ago", type: "success" },
-    { id: 3, title: "Missed Appointment", description: "Charlie Brown - Haircut", time: "2h ago", type: "error" },
-  ]
+  useEffect(() => {
+    getNotifications().then(setNotifications).catch(() => {})
+  }, [])
 
   const initials =
     profile?.full_name
@@ -107,41 +105,43 @@ export function TopBar({
               )}
             >
               <Bell className="h-4 w-4" />
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                {notifications.length}
-              </span>
+              {notifications.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {notifications.length}
+                </span>
+              )}
             </button>
 
             {isNotificationsOpen && (
               <>
-                <div 
-                  className="fixed inset-0 z-10" 
+                <div
+                  className="fixed inset-0 z-10"
                   onClick={() => setIsNotificationsOpen(false)}
                 />
                 <div className="absolute right-0 z-20 mt-2 w-72 origin-top-right rounded-xl border border-border bg-card p-2 shadow-lg ring-1 ring-black/5 animate-in fade-in zoom-in duration-150">
                   <div className="flex items-center justify-between px-3 py-2 border-b border-border mb-1">
                     <h3 className="text-sm font-bold text-foreground">Notifications</h3>
-                    <span className="text-[10px] font-medium text-primary hover:underline cursor-pointer">Mark all as read</span>
                   </div>
-                  <div className="space-y-1">
-                    {notifications.map((n) => (
-                      <div 
-                        key={n.id} 
-                        className="flex flex-col gap-0.5 rounded-lg px-3 py-2 text-sm hover:bg-accent/50 cursor-pointer transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-foreground">{n.title}</span>
-                          <span className="text-[10px] text-muted-foreground">{n.time}</span>
+                  {notifications.length === 0 ? (
+                    <div className="py-6 text-center text-sm text-muted-foreground">
+                      No new notifications.
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      {notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className="flex flex-col gap-0.5 rounded-lg px-3 py-2 text-sm hover:bg-accent/50 cursor-pointer transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-foreground">{n.title}</span>
+                            <span className="text-[10px] text-muted-foreground">{n.time}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{n.description}</p>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{n.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-1 border-t border-border pt-1">
-                    <button className="w-full py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors">
-                      View all activity
-                    </button>
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             )}

@@ -19,6 +19,7 @@ interface Conversation {
   ai_enabled: boolean
   last_message_at: string
   customers: { id: string; name: string; phone: string } | null
+  messages: { content: string; role: string; created_at: string }[] | null
 }
 
 interface Message {
@@ -210,7 +211,7 @@ export function MessagesClient({ profile, conversations }: MessagesClientProps) 
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">
-                        {conv.customers?.phone ?? "—"}
+                        {conv.messages?.[0]?.content ?? conv.customers?.phone ?? "—"}
                       </p>
                       <Badge
                         variant="secondary"

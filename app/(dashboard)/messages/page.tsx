@@ -19,10 +19,13 @@ export default async function MessagesPage() {
       current_state,
       ai_enabled,
       last_message_at,
-      customers(id, name, phone)
+      customers(id, name, phone),
+      messages(content, role, created_at)
     `)
     .eq("business_id", profile?.business_id)
     .order("last_message_at", { ascending: false })
+    .order("created_at", { ascending: false, referencedTable: "messages" })
+    .limit(1, { referencedTable: "messages" })
 
   return (
     <MessagesClient

@@ -8,6 +8,10 @@ function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 }
 
+function stripEmojis(text: string): string {
+  return text.replace(/\p{Extended_Pictographic}/gu, "").replace(/\s{2,}/g, " ").trim()
+}
+
 /**
  * Process a message within a specific conversation context.
  * Uses a multi-turn agentic loop so tool chains like
@@ -59,22 +63,28 @@ export async function processConversationMessage(conversationId: string) {
     energetic: "Energetic and upbeat",
   }
   const tone = toneMap[business.ai_tone ?? "friendly"] ?? "Friendly and warm"
-  const emojiNote = business.ai_emoji_enabled === false
-    ? "NEVER use emojis. Do not include any emoji character in your responses."
-    : "You may use emojis occasionally."
+  const noEmoji = business.ai_emoji_enabled === false
   const customInstructions = business.ai_instructions
-    ? `\n\nBusiness Instructions:\n${business.ai_instructions}`
+    ? `\nBusiness Instructions:\n${business.ai_instructions}`
     : ""
 
-  const systemPrompt = `You are the AI Receptionist for "${business.name}"${business.location ? ` (${business.location})` : ""}.
-Tone: ${tone}. ${emojiNote}
-Current booking state: ${conversation.current_state}
-Rules:
-- Today's date is: ${format(new Date(), "yyyy-MM-dd")}.
-- Business hours: ${business.working_hours_start} to ${business.working_hours_end}.
-- USE TOOLS for service pricing and available slots. NEVER guess availability.
-- When a customer requests a specific service and time: call getServices to get the service ID, then getAvailableSlots to verify, then createAppointment to confirm — complete the full booking in one flow without asking the user to wait.
-- Keep responses concise for ${conversation.platform}.${customInstructions}`
+  const systemPromptParts = [
+    noEmoji
+      ? "FORMATTING RULE (highest priority): You MUST NOT use any emoji or emoji-like symbol in any message. Zero exceptions. If you are about to write an emoji, replace it with nothing."
+      : null,
+    `You are the AI Receptionist for "${business.name}"${business.location ? ` (${business.location})` : ""}.`,
+    `Tone: ${tone}. ${noEmoji ? "Plain text only — no emojis." : "You may use emojis occasionally."}`,
+    `Current booking state: ${conversation.current_state}`,
+    "Rules:",
+    `- Today's date is: ${format(new Date(), "yyyy-MM-dd")}.`,
+    `- Business hours: ${business.working_hours_start} to ${business.working_hours_end}.`,
+    "- USE TOOLS for service pricing and available slots. NEVER guess availability.",
+    "- When a customer requests a specific service and time: call getServices to get the service ID, then getAvailableSlots to verify, then createAppointment to confirm — complete the full booking in one flow without asking the user to wait.",
+    `- Keep responses concise for ${conversation.platform}.`,
+    customInstructions || null,
+  ]
+
+  const systemPrompt = systemPromptParts.filter(Boolean).join("\n")
 
   // 4. Agentic loop — supports multi-step tool chains
   const agentMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
@@ -243,6 +253,8 @@ Rules:
 
   // 6. Save and send final response
   if (finalContent) {
+    if (noEmoji) finalContent = stripEmojis(finalContent)
+
     await supabase.from("messages").insert({
       business_id: conversation.business_id,
       customer_id: conversation.customer_id,

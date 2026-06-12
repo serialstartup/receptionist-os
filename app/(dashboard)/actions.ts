@@ -613,3 +613,51 @@ export async function updateProfile(formData: {
   revalidatePath("/dashboard")
   return { success: true }
 }
+
+export async function getNotifications() {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) return []
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("business_id")
+    .eq("id", userData.user.id)
+    .single()
+  if (!profile?.business_id) return []
+
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+  const [{ data: unreadConvs }, { data: recentAppts }] = await Promise.all([
+    supabase
+      .from("conversations")
+      .select("id, unread_count, last_message_at, customers(name)")
+      .eq("business_id", profile.business_id)
+      .gt("unread_count", 0)
+      .order("last_message_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("appointments")
+      .select("id, start_time, created_at, services(name), customers(name)")
+      .eq("business_id", profile.business_id)
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ])
+
+  const now = Date.now()
+
+  const msgNotifs = (unreadConvs ?? []).map((c: any) => {
+    const diff = Math.round((now - new Date(c.last_message_at).getTime()) / 60000)
+    const time = diff < 60 ? `${diff}m ago` : `${Math.round(diff / 60)}h ago`
+    return { id: `conv-${c.id}`, title: "New Message", description: c.customers?.name ?? "Unknown customer", time, type: "message" }
+  })
+
+  const apptNotifs = (recentAppts ?? []).map((a: any) => {
+    const diff = Math.round((now - new Date(a.created_at).getTime()) / 60000)
+    const time = diff < 60 ? `${diff}m ago` : `${Math.round(diff / 60)}h ago`
+    return { id: `appt-${a.id}`, title: "New Booking", description: `${a.customers?.name ?? "Customer"} — ${a.services?.name ?? "Service"}`, time, type: "new" }
+  })
+
+  return [...msgNotifs, ...apptNotifs].slice(0, 8)
+}
