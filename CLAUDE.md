@@ -357,7 +357,6 @@ Resolved (2026-06-12 second batch):
 
 Remaining:
 - Local Node/icu4c blocks `pnpm typecheck` and `pnpm lint` (toolchain issue, not code).
-- RESEND_API_KEY and RESEND_TO_EMAIL must be added to Vercel env before contact form works.
 - Stripe subscription (next session — full day implementation).
 
 ## Meta Setup Notes
@@ -486,11 +485,12 @@ Do not run destructive git commands unless explicitly asked.
 8. ✅ sendHumanReply action implemented and live tested.
 9. ✅ Live test: human takeover + human reply + polling + emoji toggle (2026-06-12).
 10. ✅ AI context improvements + Business Context panel + Help Center email (2026-06-12).
-11. Add RESEND_API_KEY + RESEND_TO_EMAIL to Vercel, then test contact form. ← NEXT
-12. Fill AI Settings, Services, Working Hours (manual data entry).
-13. Prepare demo/pilot customer flow.
-14. Stripe subscription integration (next dedicated session).
-15. Move toward self-serve WhatsApp onboarding.
+11. ✅ Add RESEND_API_KEY + RESEND_TO_EMAIL to Vercel env.
+12. Fill AI Settings, Services, Working Hours (manual data entry). ← NEXT
+13. Test contact form + AI context (phone/working days) via WhatsApp.
+14. Prepare demo/pilot customer flow.
+15. Stripe subscription integration (next dedicated session).
+16. Move toward self-serve WhatsApp onboarding.
 
 
 # NOTE: Whenever we change facebook access token, we need to start this command: 
