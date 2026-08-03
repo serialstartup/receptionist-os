@@ -2,15 +2,25 @@
 
 This file guides Claude Code/Codex when working inside the Receptionist OS repo.
 - Read obsidian folders in order to details:
-  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki'
-  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/current-state'
-  - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/next-actions'
+  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os'
+  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\current-state'
+  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\next-actions'
 
 Whenever we change something or add new features, we will update our obsidian folder in:
-   - '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki/decisions/[this date]'
+   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\decisions\[this date]'
+
+Daily work logs (what was done / what's next / general app info snapshot) live in:
+   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\yapılanlar.md'
+   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\yapılacaklar.md'
+   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\genel-uygulama-bilgileri.md'
 
 Permanent project memory lives at:
-`/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki`
+`C:\Users\EMİRR\Desktop\obsidians\receptionist-os`
+
+Note: this project moved from macOS to Windows on 2026-07-04. The previous
+wiki at '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki' is no
+longer reachable from this machine; the Windows obsidian vault above was
+rebuilt from this CLAUDE.md file and git history as of 2026-07-04.
 
 The wiki has its own `CLAUDE.md` for Obsidian memory rules. Do not overwrite it.
 This repo file explains the product, current state, architecture, and next work.
@@ -153,10 +163,18 @@ pnpm test:e2e
 pnpm test:e2e:seed
 ```
 
-Known local issue:
-`pnpm typecheck` and `pnpm lint` may fail locally because Homebrew Node is linked
-against a missing `icu4c` version. Treat this as a local toolchain issue until
-Node/icu4c is fixed.
+Known local issue (Mac, historical):
+`pnpm typecheck` and `pnpm lint` used to fail locally because Homebrew Node
+was linked against a missing `icu4c` version. Not applicable on the current
+Windows machine (verified clean 2026-07-30 and 2026-08-03).
+
+Lint scoping (fixed 2026-08-03): `eslint.config.mjs`'s `globalIgnores()` call
+replaces `eslint-config-next`'s default ignores instead of extending them, so
+a bare `eslint`/`eslint .` invocation ends up linting `node_modules` too
+(hundreds of thousands of false-positive problems). The `lint` script in
+`package.json` now scopes eslint to real source directories
+(`app components lib types scripts e2e`) to avoid this — always use
+`pnpm lint`, don't invoke `eslint` bare or with `.`.
 
 ## Architecture Rules
 
@@ -242,13 +260,25 @@ Permanent SaaS model:
 
 ## Instagram Architecture
 
-Instagram Messaging API is a parallel platform.
+Instagram Messaging API is a parallel platform, implemented and hardened to
+match WhatsApp (as of 2026-07-04):
 
-For the immediate MVP, WhatsApp has priority.
+- Webhook: `app/api/webhooks/instagram/route.ts`.
+- OAuth connect flow: `app/api/integrations/instagram/callback/route.ts`
+  (Facebook OAuth: code → short-lived token → long-lived token → pages →
+  `instagram_business_account` → upsert `business_integrations`).
+- Outbound client: `lib/instagram/client.ts`.
+- Shared agent core: `lib/ai/agent.ts` (`conversation.platform === "instagram"`
+  branch sends replies via the IG client using `business_integrations.ig_access_token`).
+- Routing key: `business_integrations.ig_user_id`.
 
-Instagram should reuse the same conversation/message/AI abstraction once
-WhatsApp proves webhook delivery, AI response, appointment creation, and
-dashboard visibility.
+Hardening applied 2026-07-04: `x-hub-signature-256` HMAC verification
+(reusing `META_APP_SECRET`), `after()`-deferred AI dispatch (matches
+WhatsApp's non-blocking pattern), `platform_message_id` dedup using
+`messaging.message.mid` (loop uses `continue`, not `return`, since a webhook
+call can carry multiple messages), and a `cancelAppointment` fix so
+Instagram customers (who have no phone, only `instagram_id`) can cancel via
+`conversation.customer_id` instead of a phone lookup.
 
 ## AI Receptionist Rules
 
@@ -364,6 +394,21 @@ Resolved (2026-06-18):
 36. ✅ getServerT() düzeltildi — "use client" boundary sorunu giderildi, server component çevirileri çalışıyor.
 37. ✅ Trial banner, subscription gate, onboarding checklist, wizard, help center çevrildi.
 38. ✅ Settings (billing + profile), AI Settings, Integrations, Messages, Campaigns, Analytics çevrildi.
+
+Resolved (2026-07-04):
+39. ✅ Instagram webhook hardened to WhatsApp parity: `x-hub-signature-256`
+    HMAC verification added (reuses `META_APP_SECRET`), AI dispatch moved to
+    `after()` (was blocking `await`), message insert now sets
+    `platform_message_id` from `messaging.message.mid` with `23505` dedup
+    (`continue`s the per-message loop instead of returning).
+40. ✅ `cancelAppointment` bug fixed — was looking up customers by
+    `args.customer_phone` (always failed for Instagram customers, who have
+    no phone), now uses `conversation.customer_id` directly like
+    `createAppointment` already did.
+41. ✅ `lib/ai/tools.ts` — removed dead `customer_name`/`customer_phone`
+    params from `createAppointment` and `cancelAppointment` schemas (never
+    read by the implementation; forced the AI to ask for a phone number
+    even on Instagram, where none exists).
 
 ## Meta Setup Notes
 
@@ -498,7 +543,8 @@ Do not run destructive git commands unless explicitly asked.
 15. ✅ Stripe subscription integration (2026-06-14).
 16. Stripe: Vercel env vars + Stripe Dashboard webhook kayıt + end-to-end test.
 17. ✅ Full i18n TR/EN — tüm dashboard çevrildi (2026-06-18).
-18. Instagram DM integration (webhook + AI agent). ← NEXT
+18. ✅ Instagram DM integration hardened — signature verification, async
+    dispatch, message dedup, cancelAppointment fix (2026-07-04).
 19. Meta Tech Provider başvurusu (manuel, paralel).
 20. Self-serve WhatsApp onboarding (Integrations wizard V2).
 

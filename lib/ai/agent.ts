@@ -203,38 +203,27 @@ export async function processConversationMessage(conversationId: string) {
         }
       } else if (toolCall.function.name === "cancelAppointment") {
         try {
-          const { data: cust } = await supabase
-            .from("customers")
-            .select("id")
+          const { data: appt } = await supabase
+            .from("appointments")
+            .select("id, start_time")
             .eq("business_id", conversation.business_id)
-            .eq("phone", args.customer_phone)
+            .eq("customer_id", conversation.customer_id)
+            .in("status", ["scheduled", "confirmed"])
+            .gte("start_time", new Date().toISOString())
+            .order("start_time", { ascending: true })
+            .limit(1)
             .maybeSingle()
 
-          if (!cust) {
-            result = JSON.stringify({ success: false, message: "No customer found with that phone number." })
+          if (!appt) {
+            result = JSON.stringify({ success: false, message: "No upcoming appointment found to cancel." })
           } else {
-            const { data: appt } = await supabase
+            await supabase
               .from("appointments")
-              .select("id, start_time")
-              .eq("business_id", conversation.business_id)
-              .eq("customer_id", cust.id)
-              .in("status", ["scheduled", "confirmed"])
-              .gte("start_time", new Date().toISOString())
-              .order("start_time", { ascending: true })
-              .limit(1)
-              .maybeSingle()
+              .update({ status: "cancelled" })
+              .eq("id", appt.id)
 
-            if (!appt) {
-              result = JSON.stringify({ success: false, message: "No upcoming appointment found to cancel." })
-            } else {
-              await supabase
-                .from("appointments")
-                .update({ status: "cancelled" })
-                .eq("id", appt.id)
-
-              result = JSON.stringify({ success: true, message: "Appointment cancelled successfully." })
-              newState = "START"
-            }
+            result = JSON.stringify({ success: true, message: "Appointment cancelled successfully." })
+            newState = "START"
           }
         } catch {
           result = JSON.stringify({ success: false, message: "An error occurred while cancelling." })

@@ -57,22 +57,8 @@ export const tools: ChatCompletionTool[] = [
             description:
               "The start time of the appointment (HH:mm, 24-hour format)",
           },
-          customer_name: {
-            type: "string",
-            description: "The name of the customer",
-          },
-          customer_phone: {
-            type: "string",
-            description: "The phone number of the customer",
-          },
         },
-        required: [
-          "service_id",
-          "date",
-          "time",
-          "customer_name",
-          "customer_phone",
-        ],
+        required: ["service_id", "date", "time"],
       },
     },
   },
@@ -80,16 +66,10 @@ export const tools: ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "cancelAppointment",
-      description: "Cancel an existing appointment for the customer.",
+      description: "Cancel the customer's next upcoming appointment.",
       parameters: {
         type: "object",
-        properties: {
-          customer_phone: {
-            type: "string",
-            description: "Customer's phone number to find their appointments",
-          },
-        },
-        required: ["customer_phone"],
+        properties: {},
       },
     },
   },

@@ -1,10 +1,12 @@
-import { NextResponse } from "next/server"
+import { NextResponse, after } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { processConversationMessage } from "@/lib/ai/agent"
+import crypto from "crypto"
 
 // Verify token for Instagram Webhook setup
 const VERIFY_TOKEN =
   process.env.INSTAGRAM_VERIFY_TOKEN || "beautyai_ig_verify_token_123"
+const APP_SECRET = process.env.META_APP_SECRET || ""
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -22,7 +24,22 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const rawBody = await request.text()
+    const signature = request.headers.get("x-hub-signature-256")
+
+    if (APP_SECRET && signature) {
+      const expectedSignature = crypto
+        .createHmac("sha256", APP_SECRET)
+        .update(rawBody)
+        .digest("hex")
+
+      if (`sha256=${expectedSignature}` !== signature) {
+        console.warn("Invalid signature detected on Instagram webhook")
+        return new NextResponse("Invalid Signature", { status: 401 })
+      }
+    }
+
+    const body = JSON.parse(rawBody)
 
     if (body.object === "instagram") {
       const supabase = createAdminClient()
@@ -93,18 +110,32 @@ export async function POST(request: Request) {
 
             if (!conversation) continue
 
-            // Save incoming message
-            await supabase.from("messages").insert({
+            // Save incoming message (deduplicated by platform_message_id)
+            const { error: msgError } = await supabase.from("messages").insert({
               business_id: businessId,
               customer_id: customerData?.id,
               conversation_id: conversation.id,
               role: "user",
               content: messageText,
+              platform_message_id: messaging.message.mid,
             })
 
-            // Process with AI Agent (if enabled) — agent handles sending back
+            if (msgError?.code === "23505") {
+              console.log("Duplicate IG message ignored:", messaging.message.mid)
+              continue
+            }
+
+            // Process with AI Agent (if enabled) — deferred so the webhook
+            // returns 200 immediately, same pattern as the WhatsApp route.
             if (conversation.ai_enabled) {
-              await processConversationMessage(conversation.id)
+              const convId = conversation.id
+              after(async () => {
+                try {
+                  await processConversationMessage(convId)
+                } catch (err) {
+                  console.error("AI agent error for conversation", convId, err)
+                }
+              })
             }
           }
         }

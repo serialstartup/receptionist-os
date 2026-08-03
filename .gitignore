@@ -2,6 +2,8 @@
 /node_modules
 /.pnp
 .pnp.*
+# project uses pnpm (pnpm-lock.yaml); ignore npm's lockfile if it gets created by accident
+package-lock.json
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
