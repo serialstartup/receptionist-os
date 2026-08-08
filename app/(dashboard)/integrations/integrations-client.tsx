@@ -99,7 +99,8 @@ export function IntegrationsClient({ profile, integrations, businessId }: Integr
     if (!businessId) return
     const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID
     const redirectUri = `${window.location.origin}/api/integrations/instagram/callback`
-    const scope = "instagram_manage_messages,pages_messaging,pages_show_list"
+    const scope =
+      "instagram_basic,instagram_manage_messages,pages_show_list,pages_read_engagement,business_management"
     const oauthUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${businessId}&scope=${scope}&response_type=code`
     window.location.href = oauthUrl
   }
