@@ -1,0 +1,86 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "getServices",
+      "description": "Get a list of all services offered by the salon with their IDs, duration, and prices. Useful when the caller asks about pricing or what services are provided.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    "server": {
+      "url": "https://receptionist-os.vercel.app/api/webhooks/vapi",
+      "secret": "REPLACE_WITH_VAPI_SERVER_SECRET_ENV_VALUE"
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "getAvailableSlots",
+      "description": "Find available appointment time slots for a specific service on a specific date.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "description": "The ID of the requested service"
+          },
+          "date": {
+            "type": "string",
+            "description": "The date to check availability in YYYY-MM-DD format (e.g., 2024-06-15)"
+          }
+        },
+        "required": ["service_id", "date"]
+      }
+    },
+    "server": {
+      "url": "https://receptionist-os.vercel.app/api/webhooks/vapi",
+      "secret": "REPLACE_WITH_VAPI_SERVER_SECRET_ENV_VALUE"
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "createAppointment",
+      "description": "Book an appointment for the caller.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "description": "The ID of the service to book"
+          },
+          "date": {
+            "type": "string",
+            "description": "The date of the appointment (YYYY-MM-DD)"
+          },
+          "time": {
+            "type": "string",
+            "description": "The start time of the appointment (HH:mm, 24-hour format)"
+          }
+        },
+        "required": ["service_id", "date", "time"]
+      }
+    },
+    "server": {
+      "url": "https://receptionist-os.vercel.app/api/webhooks/vapi",
+      "secret": "REPLACE_WITH_VAPI_SERVER_SECRET_ENV_VALUE"
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "cancelAppointment",
+      "description": "Cancel the caller's next upcoming appointment.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    "server": {
+      "url": "https://receptionist-os.vercel.app/api/webhooks/vapi",
+      "secret": "REPLACE_WITH_VAPI_SERVER_SECRET_ENV_VALUE"
+    }
+  }
+]

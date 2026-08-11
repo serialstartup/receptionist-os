@@ -1,9 +1,13 @@
 import OpenAI from "openai"
 import { tools } from "./tools"
 import { createAdminClient } from "@/lib/supabase/server"
-import { getAvailableSlots } from "@/lib/scheduling/engine"
-import { addMinutes, format } from "date-fns"
-import { localToUTC } from "@/lib/timezone"
+import { format } from "date-fns"
+import {
+  handleGetServices,
+  handleGetAvailableSlots,
+  handleCreateAppointment,
+  handleCancelAppointment,
+} from "./tool-handlers"
 
 function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -130,104 +134,31 @@ export async function processConversationMessage(conversationId: string) {
       let result = ""
 
       if (toolCall.function.name === "getServices") {
-        const { data } = await supabase
-          .from("services")
-          .select("id, name, price, duration_minutes")
-          .eq("business_id", conversation.business_id)
-          .eq("is_active", true)
-        result = JSON.stringify(data)
+        result = JSON.stringify(await handleGetServices(supabase, conversation.business_id))
         newState = "COLLECT_SERVICE"
       } else if (toolCall.function.name === "getAvailableSlots") {
-        if (!args.service_id || !args.date) {
-          result = JSON.stringify({ error: "Missing required parameters: service_id and date." })
-        } else {
-          try {
-            const slots = await getAvailableSlots(conversation.business_id, args.service_id, args.date)
-            result = JSON.stringify(slots)
-            newState = "COLLECT_TIME"
-          } catch (err) {
-            console.error("getAvailableSlots error:", err)
-            result = JSON.stringify({ error: "Could not fetch available slots. Please try again." })
-          }
-        }
+        const slots = await handleGetAvailableSlots(conversation.business_id, args)
+        result = JSON.stringify(slots)
+        if (!("error" in slots)) newState = "COLLECT_TIME"
       } else if (toolCall.function.name === "createAppointment") {
-        try {
-          const { data: service } = await supabase
-            .from("services")
-            .select("duration_minutes")
-            .eq("id", args.service_id)
-            .single()
-
-          if (!service) {
-            result = JSON.stringify({ success: false, message: "Service not found." })
-          } else {
-            const startDt = localToUTC(`${args.date}T${args.time}`, business.timezone || "UTC")
-            const endDt = addMinutes(startDt, service.duration_minutes)
-            const startTime = startDt.toISOString()
-            const endTime = endDt.toISOString()
-
-            // Calendar-level conflict check (no staff required)
-            const { data: conflicts } = await supabase
-              .from("appointments")
-              .select("id")
-              .eq("business_id", conversation.business_id)
-              .neq("status", "cancelled")
-              .lt("start_time", endTime)
-              .gt("end_time", startTime)
-
-            if (conflicts && conflicts.length > 0) {
-              result = JSON.stringify({ success: false, message: "That time slot is no longer available. Please choose another slot." })
-            } else {
-              const { error: insertError } = await supabase
-                .from("appointments")
-                .insert({
-                  business_id: conversation.business_id,
-                  customer_id: conversation.customer_id,
-                  service_id: args.service_id,
-                  start_time: startTime,
-                  end_time: endTime,
-                  status: "confirmed",
-                  source: conversation.platform,
-                })
-
-              if (insertError) {
-                result = JSON.stringify({ success: false, message: "Failed to book appointment. Please try again." })
-              } else {
-                result = JSON.stringify({ success: true, message: `Appointment confirmed for ${args.date} at ${args.time}.` })
-                newState = "DONE"
-              }
-            }
-          }
-        } catch {
-          result = JSON.stringify({ success: false, message: "An error occurred while booking." })
-        }
+        const booking = await handleCreateAppointment(
+          supabase,
+          conversation.business_id,
+          conversation.customer_id,
+          business.timezone,
+          conversation.platform,
+          args
+        )
+        result = JSON.stringify(booking)
+        if (booking.success) newState = "DONE"
       } else if (toolCall.function.name === "cancelAppointment") {
-        try {
-          const { data: appt } = await supabase
-            .from("appointments")
-            .select("id, start_time")
-            .eq("business_id", conversation.business_id)
-            .eq("customer_id", conversation.customer_id)
-            .in("status", ["scheduled", "confirmed"])
-            .gte("start_time", new Date().toISOString())
-            .order("start_time", { ascending: true })
-            .limit(1)
-            .maybeSingle()
-
-          if (!appt) {
-            result = JSON.stringify({ success: false, message: "No upcoming appointment found to cancel." })
-          } else {
-            await supabase
-              .from("appointments")
-              .update({ status: "cancelled" })
-              .eq("id", appt.id)
-
-            result = JSON.stringify({ success: true, message: "Appointment cancelled successfully." })
-            newState = "START"
-          }
-        } catch {
-          result = JSON.stringify({ success: false, message: "An error occurred while cancelling." })
-        }
+        const cancellation = await handleCancelAppointment(
+          supabase,
+          conversation.business_id,
+          conversation.customer_id
+        )
+        result = JSON.stringify(cancellation)
+        if (cancellation.success) newState = "START"
       }
 
       agentMessages.push({
