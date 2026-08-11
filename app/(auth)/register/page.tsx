@@ -247,7 +247,7 @@ export default function RegisterPage() {
           <div className="relative">
             <Quote className="absolute -top-1 right-0 h-8 w-8 text-primary/15" />
             <p className="text-sm leading-relaxed text-muted-foreground italic">
-              &quot;BeautyAI changed my business. I can finally focus on my
+              &quot;HopperLine changed my business. I can finally focus on my
               clients instead of my spreadsheet.&quot;
             </p>
           </div>

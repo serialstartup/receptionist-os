@@ -73,18 +73,15 @@ export function Sidebar({
             isCollapsed && "hidden"
           )}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="h-4 w-4" />
-          </div>
           <span className="text-lg font-bold tracking-tight whitespace-nowrap text-foreground">
-            BeautyAI
+            HopperLine
           </span>
         </div>
 
-        {/* Only show logo when collapsed */}
+        {/* Only show monogram when collapsed */}
         {isCollapsed && (
-          <div className="mt-6 mb-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="h-4 w-4" />
+          <div className="mt-6 mb-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+            H
           </div>
         )}
 

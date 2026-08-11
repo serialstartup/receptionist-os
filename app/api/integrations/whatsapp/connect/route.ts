@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     }
 
     // Send verification code via WhatsApp
-    const message = `🔐 BeautyAI Doğrulama Kodu: *${code}*\n\nBu kodu Bağlantılar sayfasına girerek WhatsApp entegrasyonunuzu tamamlayın. Kod 10 dakika geçerlidir.`
+    const message = `🔐 HopperLine Doğrulama Kodu: *${code}*\n\nBu kodu Bağlantılar sayfasına girerek WhatsApp entegrasyonunuzu tamamlayın. Kod 10 dakika geçerlidir.`
     const result = await whatsapp.sendMessage(phone_number, message)
 
     if (!result) {

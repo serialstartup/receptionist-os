@@ -1,4 +1,3 @@
-import { Sparkles } from "lucide-react"
 import Link from "next/link"
 
 export default function AuthLayout({
@@ -11,11 +10,8 @@ export default function AuthLayout({
       {/* Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border bg-card/80 px-6 py-4 backdrop-blur-md lg:px-10">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="h-4 w-4" />
-          </div>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
-            BeautyAI
+            HopperLine
           </h1>
         </Link>
         <div>

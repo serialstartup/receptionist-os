@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const senderEmail = userData.user?.email ?? "unknown@user"
 
   const { error } = await resend.emails.send({
-    from: "Receptionist OS <onboarding@resend.dev>",
+    from: "HopperLine <onboarding@resend.dev>",
     to: process.env.RESEND_TO_EMAIL!,
     subject: `[Support] ${subject}`,
     html: `

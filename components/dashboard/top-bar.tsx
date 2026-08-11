@@ -209,7 +209,7 @@ export function TopBar({
         <div className="fixed inset-0 z-50 flex flex-col bg-background md:hidden">
           <div className="flex h-16 items-center justify-between border-b border-border px-4">
             <span className="text-lg font-bold tracking-tight text-foreground">
-              BeautyAI
+              HopperLine
             </span>
             <button
               className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"

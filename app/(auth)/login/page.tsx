@@ -36,7 +36,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-foreground">Welcome back</h2>
           <p className="mt-2 text-muted-foreground">
-            Log in to your BeautyAI dashboard
+            Log in to your HopperLine dashboard
           </p>
         </div>
 
@@ -178,7 +178,7 @@ export default function LoginPage() {
         <a href="#" className="hover:text-foreground">
           Terms of Service
         </a>
-        <span>© 2024 BeautyAI Inc.</span>
+        <span>© 2024 HopperLine Inc.</span>
       </div>
     </div>
   )
