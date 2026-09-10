@@ -1,26 +1,21 @@
 # CLAUDE.md
 
 This file guides Claude Code/Codex when working inside the Receptionist OS repo.
-- Read obsidian folders in order to details:
-  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os'
-  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\current-state'
-  - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\next-actions'
-
-Whenever we change something or add new features, we will update our obsidian folder in:
-   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\decisions\[this date]'
-
-Daily work logs (what was done / what's next / general app info snapshot) live in:
-   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\yapılanlar.md'
-   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\yapılacaklar.md'
-   - 'C:\Users\EMİRR\Desktop\obsidians\receptionist-os\[this date]\genel-uygulama-bilgileri.md'
 
 Permanent project memory lives at:
-`C:\Users\EMİRR\Desktop\obsidians\receptionist-os`
+`/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki`
 
-Note: this project moved from macOS to Windows on 2026-07-04. The previous
-wiki at '/Users/oguztasci/Desktop/secondBrain/receptionist-os-wiki' is no
-longer reachable from this machine; the Windows obsidian vault above was
-rebuilt from this CLAUDE.md file and git history as of 2026-07-04.
+Read `index.md`, `current-state.md`, `next-actions.md`, and `open-questions.md`
+there before major work. Whenever we change something or add new features,
+update `decisions/[this date]-*.md` in that same wiki.
+
+Note: the project moved Mac → Windows on 2026-07-04 (previous Mac path
+unreachable at the time, so a parallel vault was rebuilt at
+`C:\Users\EMİRR\Desktop\obsidians\receptionist-os`) and back Windows → Mac on
+2026-09-10, when that Windows vault was merged back into the wiki above
+(decisions, current-state, next-actions, and daily logs all reconciled — see
+`log.md` entry "2026-09-10 | Mac'e dönüş" in the wiki). The path above is once
+again the single source of truth; do not create a second parallel vault.
 
 The wiki has its own `CLAUDE.md` for Obsidian memory rules. Do not overwrite it.
 This repo file explains the product, current state, architecture, and next work.
